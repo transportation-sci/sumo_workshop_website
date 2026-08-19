@@ -1,0 +1,410 @@
+/*-- scss:defaults --*/
+
+$body-bg:                #83b47e;
+$body-color:              #2b2926;
+$font-family-sans-serif: "Segoe UI", Tahoma, Arial, sans-serif;
+$font-family-monospace:  "Courier New", monospace;
+$link-color: #12783f;
+$border-radius: 6px;
+$card-bg: #fbf9f3;
+$card-border-color: #c9c9bd;
+$callout-color-note: #1e5fa8;
+$callout-color-tip: #1b7a2e;
+$callout-color-warning: #b5860a;
+$callout-color-important: #b5860a;
+$callout-border-width: 4px;
+$headings-color: #17233b;
+$code-bg: #f0efe3;
+$code-color: #4a3f1f;
+
+
+/*-- scss:rules --*/
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+// ---------------------------------------------------------------------
+// Strip Quarto's default site chrome
+// ---------------------------------------------------------------------
+#quarto-header,
+.navbar,
+#quarto-margin-sidebar,
+.nav-footer,
+#quarto-appendix,
+nav[role="doc-toc"] {
+  display: none !important;
+}
+
+#quarto-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  gap: 0 !important;
+}
+
+// Blurred background layer
+body { position: relative; }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: $body-bg url("/assets/network-bg.svg") center / cover no-repeat;
+  filter: blur(15px);
+  transform: scale(1.04); // hide blur-softened edges
+  z-index: 0;
+}
+
+// main.content and #quarto-document-content are the SAME element on
+// every page — and Quarto injects include-before-body /
+// include-after-body INSIDE it (as its first/last children), not as
+// siblings outside it. So .sumo-shell and .sumo-footer-shell live
+// inside this element too. This rule makes it the narrow white "card";
+// the two chrome pieces break themselves back out to full viewport
+// width below, rather than the other way around.
+main.content#quarto-document-content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  padding: 0 30px 40px !important;
+  background: $card-bg;
+  border-radius: $border-radius;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  min-height: 200px;
+}
+
+// ---------------------------------------------------------------------
+// Title bar / menu bar / toolbars — the sumo-gui chrome
+// ---------------------------------------------------------------------
+.sumo-shell {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-bottom: 24px;
+}
+
+.sumo-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 30px;
+  padding: 0 8px;
+  background: #ffffff;
+  border-bottom: 1px solid #cfcdb8;
+}
+.sumo-titlebar-left { display: flex; align-items: center; font-size: 13px; }
+.sumo-titlebar-home {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $body-color;
+  text-decoration: none;
+}
+.sumo-titlebar-home:hover .sumo-titlebar-text { text-decoration: underline; }
+.sumo-titlebar-home:hover .sumo-app-icon { opacity: 0.85; }
+.sumo-app-icon { width: 16px; height: 16px; flex-shrink: 0; }
+.sumo-titlebar-right { display: flex; align-items: center; gap: 2px; }
+.sumo-winctl {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 22px; font-size: 12px; color: #444;
+}
+.sumo-winctl-close { font-size: 13px; }
+
+.sumo-menubar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  height: auto;
+  min-height: 26px;
+  padding: 0 4px;
+  background: #f2f1e4;
+  border-bottom: 1px solid #cfcdb8;
+  font-size: 13px;
+}
+.sumo-menu-item {
+  padding: 3px 8px;
+  color: $body-color;
+  background: transparent;
+  cursor: default;
+  user-select: none;
+}
+.mnemonic { text-decoration: underline; }
+
+.sumo-file-menu { position: relative; }
+.sumo-file-menu summary { cursor: pointer; list-style: none; }
+.sumo-file-menu summary::-webkit-details-marker { display: none; }
+.sumo-file-menu[open] summary,
+.sumo-file-menu summary:hover { background: #cfe4ff; }
+.sumo-file-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 260px;
+  background: #fbfbfa;
+  border: 1px solid #9a9a8f;
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.25);
+  z-index: 200;
+  padding: 4px 0;
+}
+.sumo-file-dropdown a { display: block; padding: 5px 14px; text-decoration: none; font-size: 13px; }
+.sumo-file-dropdown a:hover { background: #cfe4ff; }
+.sumo-dropdown-label {
+  padding: 3px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8a8a80;
+  background: #efeee2;
+}
+.sumo-dropdown-divider { height: 1px; background: #ddd; margin: 4px 0; }
+
+.sumo-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 34px;
+  padding: 0 8px;
+  background: #f2f1e4;
+  border-bottom: 1px solid #cfcdb8;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.sumo-toolbar-2 { height: 30px; }
+
+.sumo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #333;
+  flex-shrink: 0;
+}
+.sumo-icon svg { width: 100%; height: 100%; }
+.sumo-icon--small { width: 15px; height: 15px; }
+.sumo-icon--play { color: #2c8a3d; }
+.sumo-icon--stop { color: #c23b3b; }
+.sumo-icon--active { background: #cfe4ff; border-radius: 2px; }
+
+.sumo-divider { width: 1px; height: 20px; background: #cac8b8; flex-shrink: 0; }
+
+.sumo-field { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.sumo-field-label { font-size: 12px; color: #444; white-space: nowrap; }
+.sumo-led {
+  background: #060606;
+  color: #39e35d;
+  font-family: $font-family-monospace;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border: 1px solid #333;
+  border-radius: 2px;
+}
+.sumo-spinbox {
+  background: #fff;
+  border: 1px solid #b8b6a8;
+  border-radius: 2px;
+  padding: 2px 8px;
+  font-size: 12px;
+  min-width: 28px;
+  text-align: right;
+}
+.sumo-slider { position: relative; width: 90px; height: 3px; background: #b8b6a8; border-radius: 2px; }
+.sumo-slider-thumb {
+  position: absolute;
+  top: 50%;
+  left: 18%;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border: 1px solid #888;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.sumo-dropdown-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid #b8b6a8;
+  border-radius: 2px;
+  padding: 2px 8px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.sumo-chevron { width: 12px; height: 12px; color: #777; }
+
+// ---------------------------------------------------------------------
+// Footer chrome: message window + status bar
+// ---------------------------------------------------------------------
+.sumo-messagewindow {
+  background: #fff;
+  border-top: 1px solid #cfcdb8;
+  padding: 6px 10px;
+  font-family: $font-family-monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.sumo-msg { color: #222; }
+.sumo-msg-success { color: #1b7a2e; }
+
+.sumo-statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 24px;
+  padding: 0 10px;
+  background: #f2f1e4;
+  border-top: 1px solid #cfcdb8;
+  font-size: 11.5px;
+  color: #333;
+  gap: 8px;
+}
+.sumo-statusbar-left { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sumo-statusbar-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.sumo-status-icon { width: 14px; height: 14px; }
+.sumo-status-sep { color: #aaa; }
+
+.sumo-footer-shell {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  margin-top: 24px;
+}
+
+// ---------------------------------------------------------------------
+// Title block (from YAML title: / subtitle: / date:) becomes the blue
+// banner at the top of the card.
+// ---------------------------------------------------------------------
+#title-block-header {
+  margin: 0 -30px 22px;
+  padding: 16px 30px;
+  background: $link-color;
+  color: #fff;
+  border-radius: $border-radius $border-radius 0 0;
+}
+#title-block-header .title { margin: 0; font-size: 22px; font-weight: 700; color: #fff; }
+#title-block-header .subtitle {
+  margin: 10 0 2px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #cfe0f5;
+  opacity: 1;
+}
+#title-block-header .quarto-title-meta { margin-top: 6px; font-size: 12px; color: #cfe0f5; }
+#title-block-header .quarto-title-meta-heading { display: none; }
+#title-block-header .quarto-title-meta-contents p { margin: 0; }
+#title-block-header .description { display: none; }
+
+// Base typography for post/page body content — headings, paragraphs,
+// lists, and code all come from $headings-color / $code-bg / etc.
+// above; only spacing and card-specific tweaks live here.
+//
+// Body text is 16px (not 15px) and the card is narrower than it looks
+// like it should be (700px, not wider) specifically to land in the
+// ~66-75 characters-per-line range that's easiest to read over a full
+// lesson, rather than the ~90 chars/line a wider card would give.
+#quarto-document-content h2 {
+  font-size: 20px;
+  margin-top: 32px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e2e2da;
+}
+#quarto-document-content h3 { font-size: 18px; margin-top: 22px; }
+#quarto-document-content p { line-height: 1.7; font-size: 17px; }
+#quarto-document-content ul,
+#quarto-document-content ol { line-height: 1.65; font-size: 16px; padding-left: 22px; }
+#quarto-document-content li { margin: 5px 0; }
+#quarto-document-content code {
+  border: 1px solid #ddd8c4;
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 0.95em;
+}
+#quarto-document-content pre {
+  border: 1px solid #ddd8c4;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 16px;
+  overflow-x: auto;
+}
+#quarto-document-content pre code { border: none; padding: 0; }
+#quarto-document-content blockquote {
+  border-left: 4px solid #c9c9bd;
+  margin: 16px 0;
+  padding: 4px 16px;
+  color: #444;
+  font-style: italic;
+}
+
+// ---------------------------------------------------------------------
+// Callouts — colors/icon come from the scss:defaults variables above.
+// These rules only tighten spacing/sizing to match the compact card.
+// ---------------------------------------------------------------------
+.callout { margin: 18px 0; font-size: 15.5px; }
+.callout-header { padding: 8px 14px; font-weight: 600; }
+.callout-body-container { padding: 4px 14px 12px; }
+.callout-body-container p:first-child { margin-top: 0; }
+.callout-body-container p:last-child { margin-bottom: 0; }
+
+// ---------------------------------------------------------------------
+// Prev/next lesson nav — a plain fenced div, ::: {.lesson-nav}, with
+// two Markdown links inside.
+// ---------------------------------------------------------------------
+.lesson-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin: 26px -30px -40px;
+  padding: 14px 30px;
+  border-top: 1px solid #e2e2da;
+  background: #f7f7f2;
+  border-radius: 0 0 $border-radius $border-radius;
+}
+.lesson-nav p { margin: 0; }
+.lesson-nav a,
+.lesson-nav span.disabled {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1px solid #c9c9bd;
+  border-radius: 4px;
+  color: $body-color;
+  text-decoration: none;
+  font-size: 13px;
+  background: #fff;
+  white-space: nowrap;
+}
+.lesson-nav span.disabled { color: #aaa; background: #f0f0ea; }
+.lesson-nav a.primary { background: $link-color; color: #fff; border-color: $link-color; }
+
+// ---------------------------------------------------------------------
+// Listing (homepage) — .quarto-grid-item is also a Bootstrap .card, so
+// $card-bg / $card-border-color / $border-radius already style it. We
+// only need a shadow (cards have none by default) and a bit of sizing.
+// ---------------------------------------------------------------------
+.quarto-listing { max-width: 900px; margin: 0 auto; }
+.quarto-grid-item { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); }
+.quarto-grid-item .listing-title { color: $link-color; font-weight: 700; }
+.quarto-grid-item .card-img-top { background: #eef1e4; }
+
+// ---------------------------------------------------------------------
+// Responsive
+// ---------------------------------------------------------------------
+@media (max-width: 640px) {
+  .sumo-titlebar-text { display: none; }
+  main.content#quarto-document-content { padding: 0 18px 28px !important; }
+  .sumo-shell { margin-bottom: 18px; }
+  .sumo-footer-shell { margin-top: 18px; }
+  #title-block-header { margin: 0 -18px 18px; padding: 14px 18px; }
+  .lesson-nav { margin: 22px -18px -28px; padding: 12px 18px; }
+  .sumo-statusbar-left { max-width: 45%; }
+}

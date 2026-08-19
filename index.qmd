@@ -1,0 +1,14 @@
+---
+title: "SUMO Lessons"
+listing:
+  contents: posts/**/index.qmd
+  type: grid
+  sort: "date asc"
+  fields: [image, title, description]
+  grid-columns: 2
+  image-height: 140px
+page-layout: full
+title-block-banner: false
+---
+
+A course on **SUMO (Simulation of Urban MObility)**. Pick a lesson below, or open it from the **File** menu above at any time.

@@ -1,0 +1,18 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "SUMO Lessons"
+  description: "A short course on SUMO, styled after the sumo-gui interface."
+
+format:
+  html:
+    theme: theme.scss
+    include-before-body: includes/sumo-header.html
+    include-after-body: includes/sumo-footer.html
+    page-layout: full
+    toc: false
+    title-block-banner: false
+    anchor-sections: false
+    smooth-scroll: false

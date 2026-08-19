@@ -1,0 +1,325 @@
+<script>
+/* ---- SUMO network, deconstructed ----
+ * Marker slide: .sd-slide   Stage container: #sd-stage
+ * Stage 0 (built here): the raw SUMO net/route XML on the left, the produced
+ * road diagram on the right. The plot is built as four stacked SVG "planes"
+ * — one per XML tag group (nodes, edges, connections, routes) — so a later
+ * explode step can pull them apart alongside the matching XML block.
+ * Geometry (lane offsets, connection curves, route bands) is derived once
+ * below directly from the same nodes/edges/connections/routes definitions
+ * used to generate the XML text. render(stage) is idempotent.
+ */
+(function () {
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  // ---- network definition (from nodes.xml / edges.xml / connections.xml) --
+  const NODE_DEF = {
+    n_up:     { x: 0,    y: 0    },
+    n_merge1: { x: 1000, y: 0    },
+    n_merge2: { x: 1300, y: 0    },
+    n_down:   { x: 2300, y: 0    },
+    n_ramp:   { x: 700,  y: -200 },
+  };
+  const EDGE_DEF = {
+    e_up:    { from: 'n_up',     to: 'n_merge1', lanes: 3 },
+    e_merge: { from: 'n_merge1', to: 'n_merge2', lanes: 4 },
+    e_down:  { from: 'n_merge2', to: 'n_down',   lanes: 3 },
+    e_ramp:  { from: 'n_ramp',   to: 'n_merge1', lanes: 1 },
+  };
+  const CONNECTION_DEF = [
+    ['e_up', 'e_merge', 0, 1], ['e_up', 'e_merge', 1, 2], ['e_up', 'e_merge', 2, 3],
+    ['e_ramp', 'e_merge', 0, 0],
+    ['e_merge', 'e_down', 0, 0], ['e_merge', 'e_down', 1, 0],
+    ['e_merge', 'e_down', 2, 1], ['e_merge', 'e_down', 3, 2],
+  ];
+  // route -> which lane(s) of each edge it rides (used to center the route band)
+  const ROUTE_DEF = {
+    r_main: [['e_up', [0, 1, 2]], ['e_merge', [1, 2, 3]], ['e_down', [0, 1, 2]]],
+    r_ramp: [['e_ramp', [0]], ['e_merge', [0]], ['e_down', [0]]],
+  };
+
+  // ---- laid-out node positions (plot units, hand-placed to keep the
+  // diagram legible rather than to real-world scale) ----------------------
+  const NODES = {
+    n_up:     { x: 40,  y: 190 },
+    n_merge1: { x: 230, y: 190 },
+    n_merge2: { x: 310, y: 190 },
+    n_down:   { x: 560, y: 190 },
+    n_ramp:   { x: 139, y: 254 },
+  };
+  const LANE_W = 9; // lane spacing in plot units (stylized, not to scale)
+
+  function sub(a, b) { return { x: a.x - b.x, y: a.y - b.y }; }
+  function add(a, b) { return { x: a.x + b.x, y: a.y + b.y }; }
+  function norm(a) { const m = Math.hypot(a.x, a.y); return { x: a.x / m, y: a.y / m }; }
+
+  function edgeFrame(e) {
+    const p0 = NODES[EDGE_DEF[e].from], p1 = NODES[EDGE_DEF[e].to];
+    const d = norm(sub(p1, p0));
+    const n = { x: -d.y, y: d.x }; // +90deg: lane0 sits on the "right" (south) side
+    return { p0, p1, d, n };
+  }
+  function laneOffset(nLanes, i, n) {
+    const off = LANE_W * (nLanes / 2 - 0.5 - i);
+    return { x: n.x * off, y: n.y * off };
+  }
+  // (edge, lane) -> {start, end}
+  const laneGeom = {};
+  Object.keys(EDGE_DEF).forEach(e => {
+    const { p0, p1, n } = edgeFrame(e);
+    for (let i = 0; i < EDGE_DEF[e].lanes; i++) {
+      const off = laneOffset(EDGE_DEF[e].lanes, i, n);
+      laneGeom[e + '#' + i] = { start: add(p0, off), end: add(p1, off) };
+    }
+  });
+
+  const LANES = [];
+  Object.keys(EDGE_DEF).forEach(e => {
+    for (let i = 0; i < EDGE_DEF[e].lanes; i++) {
+      const g = laneGeom[e + '#' + i];
+      LANES.push({ edge_id: e, lane_index: i, g });
+    }
+  });
+
+  const CONNECTIONS = CONNECTION_DEF.map(([fe, te, fl, tl], i) => {
+    const node = NODES[EDGE_DEF[fe].to]; // == EDGE_DEF[te].from
+    const a = laneGeom[fe + '#' + fl].end;
+    const b = laneGeom[te + '#' + tl].start;
+    return { id: 'c' + i, d: `M${a.x},${a.y} Q${node.x},${node.y} ${b.x},${b.y}` };
+  });
+
+  function routeCenter(e, laneList) {
+    const { p0, p1, n } = edgeFrame(e);
+    const offs = laneList.map(i => laneOffset(EDGE_DEF[e].lanes, i, n));
+    const avg = { x: offs.reduce((s, o) => s + o.x, 0) / offs.length, y: offs.reduce((s, o) => s + o.y, 0) / offs.length };
+    return { start: add(p0, avg), end: add(p1, avg) };
+  }
+  const ROUTES = {};
+  Object.keys(ROUTE_DEF).forEach(r => {
+    const pts = [];
+    ROUTE_DEF[r].forEach(([e, laneList]) => {
+      const c = routeCenter(e, laneList);
+      if (!pts.length) pts.push(c.start);
+      pts.push(c.end);
+    });
+    ROUTES[r] = 'M' + pts.map(p => `${p.x},${p.y}`).join(' L');
+  });
+
+  // ---- plot geometry (local coords inside the 600x380 #sd-plot box) -------
+  const W = 600, H = 380;
+
+  function el(name, attrs, parent) {
+    const e = document.createElementNS(SVGNS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function txt(svg, x, y, s, attrs) {
+    const t = el('text', Object.assign({ x, y, 'font-family': 'sans-serif' }, attrs), svg);
+    t.textContent = s;
+    return t;
+  }
+  function svgPlane(id) {
+    const d = document.createElement('div');
+    d.className = 'sd-plane';
+    d.id = id;
+    d.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;';
+    const tilt = document.createElement('div');
+    tilt.className = 'sd-tilt';
+    const card = document.createElement('div');
+    card.className = 'sd-card';
+    tilt.appendChild(card);
+    const s = el('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', height: '100%', preserveAspectRatio: 'xMidYMid meet' });
+    s.style.cssText = 'position:absolute;left:0;top:0;';
+    tilt.appendChild(s);
+    d.appendChild(tilt);
+    return { div: d, tilt, svg: s, card };
+  }
+
+  // ---- planes -------------------------------------------------------------
+  function buildEdges(svg) {
+    LANES.forEach(l => {
+      el('path', { d: `M${l.g.start.x},${l.g.start.y} L${l.g.end.x},${l.g.end.y}`,
+        stroke: '#000', 'stroke-width': 3.2, 'stroke-linecap': 'round', fill: 'none' }, svg);
+    });
+    // edge id labels, below the lowest lane of each edge
+    Object.keys(EDGE_DEF).forEach(e => {
+      const lanes = LANES.filter(l => l.edge_id === e);
+      const maxY = Math.max(...lanes.map(l => Math.max(l.g.start.y, l.g.end.y)));
+      const midX = lanes.reduce((s, l) => s + (l.g.start.x + l.g.end.x) / 2, 0) / lanes.length;
+      const midY = lanes.reduce((s, l) => s + (l.g.start.y + l.g.end.y) / 2, 0) / lanes.length;
+      const isRamp = e === 'e_ramp';
+      txt(svg, isRamp ? midX - 34 : midX, isRamp ? midY + 6 : maxY + 16, e,
+        { 'text-anchor': 'middle', 'font-size': 12, fill: '#000', 'font-weight': 700 });
+    });
+    // lane number labels, centered on each lane
+    LANES.forEach(l => {
+      const mx = (l.g.start.x + l.g.end.x) / 2, my = (l.g.start.y + l.g.end.y) / 2;
+      txt(svg, mx, my + 3, l.lane_index, { 'text-anchor': 'middle', 'font-size': 9, fill: 'yellow', 'font-weight': 700 });
+    });
+  }
+
+  function buildConnections(svg) {
+    CONNECTIONS.forEach(c => el('path', { d: c.d, stroke: '#e38024', 'stroke-width': 2.6, 'stroke-linecap': 'round', fill: 'none' }, svg));
+    const arrowId = 'sd-arrow';
+    const defs = el('defs', {}, svg);
+    const marker = el('marker', { id: arrowId, markerWidth: 6, markerHeight: 6, refX: 4.5, refY: 3, orient: 'auto' }, defs);
+    el('path', { d: 'M0,0 L6,3 L0,6 Z', fill: 'yellow' }, marker);
+    CONNECTIONS.forEach(c => el('path', {
+      d: c.d, stroke: 'yellow', 'stroke-width': 1.1, 'stroke-linecap': 'round', fill: 'none',
+      'marker-end': `url(#${arrowId})`,
+    }, svg));
+  }
+
+  function buildRoutes(svg) {
+    el('path', { d: ROUTES.r_main, stroke: '#FFEB00', 'stroke-width': 11, 'stroke-opacity': 0.85, 'stroke-linecap': 'round', fill: 'none' }, svg);
+    el('path', { d: ROUTES.r_ramp, stroke: '#FF8C00', 'stroke-width': 11, 'stroke-opacity': 0.85, 'stroke-linecap': 'round', fill: 'none' }, svg);
+    txt(svg, 470, 158, 'r_main', { 'font-size': 11, fill: '#8a6d00', 'font-weight': 700 });
+    txt(svg, 405, 222, 'r_ramp', { 'font-size': 11, fill: '#a3510a', 'font-weight': 700 });
+  }
+
+  function buildNodes(svg) {
+    Object.keys(NODE_DEF).forEach(id => {
+      const p = NODES[id];
+      el('circle', { cx: p.x, cy: p.y, r: 10, fill: '#CC0000', stroke: '#660000', 'stroke-width': 1.4 }, svg);
+    });
+    Object.keys(NODE_DEF).forEach(id => {
+      const p = NODES[id];
+      txt(svg, p.x, p.y - 16, id, { 'text-anchor': 'middle', 'font-size': 10.5, fill: '#000', 'font-weight': 700 });
+    });
+  }
+
+  // ---- left-hand code listing: the actual SUMO XML, grouped by tag -------
+  // Built as one DOM element per line (indentation via CSS padding, not
+  // literal leading spaces) so it can't be mangled by whitespace collapsing.
+  const tag = (name, attrs) => {
+    const a = attrs.map(([k, v]) => ` <span class="sd-arg">${k}</span>=<span class="sd-str">"${v}"</span>`).join('');
+    return `&lt;<span class="sd-fn">${name}</span>${a}/&gt;`;
+  };
+  const GROUPS = [
+    { blk: 'nodes', tagName: 'nodes',
+      lines: Object.entries(NODE_DEF).map(([id, n]) => tag('node', [['id', id], ['x', n.x], ['y', n.y]])) },
+    { blk: 'edges', tagName: 'edges',
+      lines: Object.entries(EDGE_DEF).map(([id, e]) => tag('edge', [['id', id], ['from', e.from], ['to', e.to], ['numLanes', e.lanes]])) },
+    { blk: 'connections', tagName: 'connections',
+      lines: CONNECTION_DEF.map(([fe, te, fl, tl]) => tag('connection', [['from', fe], ['to', te], ['fromLane', fl], ['toLane', tl]])) },
+    { blk: 'routes', tagName: 'routes',
+      lines: Object.keys(ROUTE_DEF).map(id => tag('route', [['id', id], ['edges', ROUTE_DEF[id].map(x => x[0]).join(' ')]])) },
+  ];
+
+  function codeLine(html, indented) {
+    const d = document.createElement('div');
+    d.className = 'sd-line' + (indented ? ' sd-indent' : '');
+    d.innerHTML = html;
+    return d;
+  }
+  function codeGroup(g) {
+    const d = document.createElement('div');
+    d.className = 'sd-group';
+    d.dataset.blk = g.blk;
+    d.appendChild(codeLine(`&lt;<span class="sd-fn">${g.tagName}</span>&gt;`, false));
+    g.lines.forEach(l => d.appendChild(codeLine(l, true)));
+    d.appendChild(codeLine(`&lt;/<span class="sd-fn">${g.tagName}</span>&gt;`, false));
+    return d;
+  }
+
+  let built = false;
+  let planes = [];        // [nodes, edges, connections, routes] bottom -> top
+  let codeBlocks = [];    // the .sd-group code blocks
+  let codeEl = null;      // the .sd-code container (for centering a lone group)
+  const BLK = ['nodes', 'edges', 'connections', 'routes'];   // plane index -> code block
+  function build() {
+    const stage = document.getElementById('sd-stage');
+    if (!stage || built) return !!stage;
+    built = true;
+
+    const code = document.createElement('div');
+    code.className = 'sd-code';
+    GROUPS.forEach(g => code.appendChild(codeGroup(g)));
+    stage.appendChild(code);
+    codeBlocks = Array.from(code.querySelectorAll('.sd-group'));
+    codeEl = code;
+
+    const plot = document.createElement('div');
+    plot.id = 'sd-plot';
+    const nodesP      = svgPlane('sd-plane-nodes');
+    const edges       = svgPlane('sd-plane-edges');
+    const connections = svgPlane('sd-plane-connections');
+    const routes      = svgPlane('sd-plane-routes');
+    buildNodes(nodesP.svg);
+    buildEdges(edges.svg);
+    buildConnections(connections.svg);
+    buildRoutes(routes.svg);
+    planes = [nodesP, edges, connections, routes];
+    planes.forEach(p => plot.appendChild(p.div));
+    stage.appendChild(plot);
+    return true;
+  }
+
+  function render(stage) {
+    if (!build()) return;
+    // stage 0: flat, head-on diagram.
+    // stage 1: the diagram "lays down" — tilts back into 3D so the stacked
+    //          planes are ready to explode apart in depth.
+    // closing fragments: stage 7 collapses the stack back together (still
+    // tilted); stage 8 un-rotates it flat to the head-on diagram.
+    const flat = stage >= 8;
+    const collapsed = stage >= 7;
+    const laid = stage >= 1 && !flat;
+    const exploded = stage >= 2 && !collapsed;
+
+    // stage 3+: walk up the stack, focusing one slice (and its code block) at
+    // a time. stage 3 -> bottom slice (nodes).
+    const focusIdx = (stage >= 3 && !collapsed) ? stage - 3 : -1;
+    const focusBlk = focusIdx >= 0 ? BLK[focusIdx] : null;
+
+    const N = planes.length;
+    const SPREAD = 100;   // screen-space vertical gap between cards
+    const PART = 375;     // how far the non-focused layers slide out of the way
+    planes.forEach((p, i) => {
+      let fan = exploded ? 18 + ((N - 1) / 2 - i) * SPREAD : 0;
+      const focused = focusIdx >= 0 && i === focusIdx;
+      if (focusIdx >= 0 && !focused) {
+        fan += (i < focusIdx) ? PART : -PART;
+      }
+      const tilted = laid && !focused;
+      TM.anime({
+        targets: p.div,
+        translateY: fan,
+        duration: 850,
+        easing: 'easeInOutCubic',
+      });
+      TM.anime({
+        targets: p.tilt,
+        rotateX: tilted ? 56 : 0,
+        rotateZ: tilted ? 20 : 0,
+        scale: exploded ? 0.82 : 1,
+        opacity: 1,
+        duration: 850,
+        easing: 'easeInOutCubic',
+      });
+      TM.anime({
+        targets: p.card,
+        opacity: exploded ? 1 : 0,
+        duration: 600,
+        easing: 'easeInOutQuad',
+      });
+    });
+
+    codeBlocks.forEach(b => {
+      const focused = b.dataset.blk === focusBlk;
+      b.classList.toggle('sd-hot', focused);
+      b.classList.toggle('sd-code-hidden', focusBlk !== null && !focused);
+    });
+    if (codeEl) codeEl.classList.toggle('sd-code-solo', focusBlk !== null);
+  }
+
+  TM.gate({
+    markerClass: 'sd-slide',
+    fragmentIds: ['sd-lay', 'sd-explode',
+                  'sd-focus-nodes', 'sd-focus-edges', 'sd-focus-connections', 'sd-focus-routes',
+                  'sd-collapse', 'sd-unrotate'],
+    render,
+  });
+})();
+</script>

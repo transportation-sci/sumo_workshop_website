@@ -1,0 +1,33 @@
+---
+title: "10-Running the Simulation"
+subtitle: "Lesson 4 of 4"
+description: "Tying it together with a .sumocfg and reading the output."
+date: today
+image: /assets/network-bg.svg
+page-layout: full
+title-block-banner: false
+---
+
+Once a network and a demand file exist, a `.sumocfg` file ties them together. You can run the
+simulation headless from the command line for speed, or open it in **sumo-gui** — the interface
+this site's chrome is modeled on — to watch traffic move through the network.
+
+::: {.callout-note title="Key concepts"}
+- Play / Pause / Step advance the simulation clock
+- The delay slider slows playback so fast simulations are easier to watch
+- `tripinfo-output` logs each vehicle's travel time, waiting time, and route length
+- Coloring schemes can shade vehicles or edges by speed, occupancy, or fuel use
+:::
+
+::: {.callout-tip title="Tip"}
+Run a short simulation first to sanity-check your setup before scaling up to a full day of
+demand.
+:::
+
+::: {.lesson-nav}
+[← Traffic Demand & Routes](../lesson-3-traffic-demand/index.qmd)
+
+[🏠 All Lessons](../../index.qmd){.primary}
+
+[Next]{.disabled}
+:::

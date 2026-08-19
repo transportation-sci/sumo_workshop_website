@@ -1,0 +1,81 @@
+---
+title: "01: Setup"
+description: "Install SUMO, Python, and uv"
+date: today
+image: https://upload.wikimedia.org/wikipedia/commons/f/f5/Sumo_application_icon.svg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original
+page-layout: full
+title-block-banner: false
+number-sections: true
+---
+
+**SUMO (Simulation of Urban MObility)** is a microscopic and continuous multi-modal traffic 
+simulation package designed to handle large networks.
+
+[Docs](https://sumo.dlr.de/docs/index.html){target="_blank"}
+
+## Install SUMO
+
+Visit the [official website](https://eclipse.dev/sumo/){target="_blank"} to download SUMO. During installation accept the defaults. Then check that it is installed by searching `sumo-gui`.
+
+## Create `SUMO_HOME` system variable 
+
+On Windows:
+
+* Search for 'Edit the system environment variables'
+* Click **Environment Variables**
+* Create a new variable named `SUMO_HOME` in the 'System variables' section
+* Enter the path to SUMO binary in the 'Variable value' text box. For example: `C:\Program Files (x86)\Eclipse\Sumo\`
+* Click OK in all the windows
+
+## Install `uv`
+
+`uv` is "an extremely fast Python package and project manager". 
+
+`uv` will help us installing Python and setting up a virtual environment with `traci` and other Python packages.
+
+* Go to [Installation page](https://docs.astral.sh/uv/getting-started/installation/){target="_blank"}
+* Run the command for your operating system, e.g., in Windows, copy and paste the given command in PowerShell (Open PowerShell by searching it in Windows).
+* Close PowerShell
+
+
+## Install Python
+
+Python is needed for using TraCI (Traffic Control Interface). TraCI allows to retrieve values of simulated objects and to manipulate their behavior in a running simulation.
+
+[Download and install Python manually](https://www.python.org/downloads/){target="_blank"}
+
+Or see below to install Python via `uv` with the Positron IDE
+
+## Install Positron IDE
+
+Positron IDE is needed to:
+
+* View or create simulation files
+* Running TraCI with a specific virtual environment in Python
+
+[Download and install Positron IDE](https://positron.posit.co/download.html){target="_blank"}
+
+Accept all the defaults in the installation setup. Once installed, Positron would open by itself or you can open it by searching for `Positron`.
+
+## Download and sync workshop folder
+
+* Download the zipped folder [`sumo_workshop`](https://github.com/transportation-sci/sumo_workshop) from GitHub and extract it. You can download it by clicking the dropdown menu of the green code button and clicking `Download ZIP`. Make sure to extract it by right clicking the zipped folder and click Extract All.
+* Open Positron, click Open > Open Folder and select the extracted folder
+* You may see a dialog box in Positron asking if yoy trust the authors. Select yes I trust the authors. Dismiss any notifications.
+* Run `uv sync` in terminal. If you don't see the terminal, click `Ctrl + Shift + backtick`. If the command `uv sync` does not work, restart Positron and try again.
+* Once Python and packages are installed, you will see `.venv` created in Positron's files explorer. See if Python is working by clicking `Start Session` at the top-right of Positron and selecting `Python 3.14.x (uv: sumo-workshop)`. That would start Python in a console window (you may have to click allow in a different window first). Run the following Python command:
+
+```python
+1 + 1
+```
+
+If the code above runs, you're all set!
+
+
+::: {.lesson-nav}
+[← Previous]{.disabled}
+
+[🏠 All Lessons](../../index.qmd)
+
+[Next: The Whole Game →](../02-whole_game/index.qmd){.primary}
+:::

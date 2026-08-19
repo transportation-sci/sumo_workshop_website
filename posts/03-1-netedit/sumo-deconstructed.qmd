@@ -1,0 +1,30 @@
+---
+format:
+  revealjs:
+    controls: true
+    menu: false
+    theme: [default, css/demos.css]
+    width: 1280
+    height: 720
+    include-in-header:
+         text: |
+           <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+    include-after-body:
+      - js/infra.html
+      - js/_sumo-deconstructed.html
+---
+
+## {.sd-slide}
+
+::: {.sd-stage-wrap}
+<div id="sd-stage"></div>
+:::
+
+[]{.fragment .sd-frag id="sd-lay"}
+[]{.fragment .sd-frag id="sd-explode"}
+[]{.fragment .sd-frag id="sd-focus-nodes"}
+[]{.fragment .sd-frag id="sd-focus-edges"}
+[]{.fragment .sd-frag id="sd-focus-connections"}
+[]{.fragment .sd-frag id="sd-focus-routes"}
+[]{.fragment .sd-frag id="sd-collapse"}
+[]{.fragment .sd-frag id="sd-unrotate"}

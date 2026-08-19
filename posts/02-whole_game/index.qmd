@@ -1,0 +1,72 @@
+---
+title: "02: The Whole Game"
+description: "Running your first simulation"
+date: today
+image: /assets/osm_web_wizard.gif
+page-layout: full
+title-block-banner: false
+---
+
+## OSM Web Wizard
+
+OSM stands for [Open Street Map](https://www.openstreetmap.org/){target="_blank"} and it lets you export network data at no cost (with limitations). OSM Web Wizard is a utility developed by the SUMO team to let users develop a quick simulation with the following features:
+
+- Select a medium sized desired area
+- Import satellite background, car network, and public transport network with network details
+- Specify Left-hand or Right-hand traffic (default)
+- Specify random traffic that could be all cars and/or other traffic such as trucks, buses, pedestrians, trains, etc.
+
+### Steps to generate an example scenario
+
+Open the `sumo_workshop` folder in Positron.
+
+1. Run the following in Powershell:
+
+```powershell
+cd .\module1\01-theWholeGame\
+uv run "$env:SUMO_HOME\tools\osmWebWizard.py"
+```
+
+That will open the wizard in your default browser.
+
+2. In the wizard tab, search for **Oshawa, Ontario** or any desired area
+3. Click 'Select Area' checkbox and select a small desired area
+4. Check only 'Car-only Network' and 'Satellite background'
+5. Go to **Vehicles** tab, check 'Cars' and 'Trucks' and keep the default values of the through traffic factor & count
+6. In the **Road-Types** tab, check Highway with all subcategories and uncheck everything else
+7. Click the **Generate Scenario** button
+
+If the map data download is successful, all files will be saved to the `module1\01-theWholeGame\<new folder with date>` folder and SUMO window will launch.
+
+Close the wizard tab in your browser and run `Ctrl + C` in the terminal to stop.
+
+### Run the simulation
+
+The previous step would open SUMO for you. If it didn't or you closed SUMO, you may open it again by double clicking the `osm.sumocfg` file in the `module1\01-theWholeGame\<new folder with date>` folder.
+
+1. Increase the **Delay (ms)** to > 500 so you'd be able to see the traffic in slow motion
+2. Click the Run button (looks like the Play button)
+3. If vehicles are not seen right away, click on the **Locate Structures** button (question mark icon) and then click the **Locate Vehicles** button. Select any vehicle and the click *Center* or *Track*
+4. You may stop the simulation at any time
+
+![](/assets/osm_web_wizard.gif)
+
+## View the contents of `module1\01-theWholeGame\<new folder with date>`
+
+**Relevant files:**
+
+* `osm.net.xml.gz`: Network
+* `osm.passenger.trips.xml` and `osm.trucks.trips.xml`: Individual trips at random road segments
+* `osm.sumocfg`: Configuration file that specifies the network, route (trips), output, and other files
+
+
+
+
+
+::: {.lesson-nav}
+[← Setup](../01-setup/index.qmd)
+
+[🏠 All Lessons](../../index.qmd)
+
+[Next: NetEdit →](../03-1-netedit/index.qmd){.primary}
+:::
