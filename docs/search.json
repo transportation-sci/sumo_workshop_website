@@ -7,6 +7,34 @@
     "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world\n      \n    \n    \n      \n        \n        \n        \n        \n      \n    \n    \n      \n    \n  \n\n\n\n\n\nOnce a network and a demand file exist, a .sumocfg file ties them together. You can run the simulation headless from the command line for speed, or open it in sumo-gui — the interface this site’s chrome is modeled on — to watch traffic move through the network.\n\n\n\n\n\n\nNoteKey concepts\n\n\n\n\nPlay / Pause / Step advance the simulation clock\nThe delay slider slows playback so fast simulations are easier to watch\ntripinfo-output logs each vehicle’s travel time, waiting time, and route length\nColoring schemes can shade vehicles or edges by speed, occupancy, or fuel use\n\n\n\n\n\n\n\n\n\nTipTip\n\n\n\nRun a short simulation first to sanity-check your setup before scaling up to a full day of demand.\n\n\n\n← Traffic Demand & Routes\n🏠 All Lessons\nNext"
   },
   {
+    "objectID": "posts/03-1-netedit/index.html",
+    "href": "posts/03-1-netedit/index.html",
+    "title": "03.1: Create networks by hand in netedit",
+    "section": "",
+    "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world"
+  },
+  {
+    "objectID": "posts/03-1-netedit/index.html#creating-intersections",
+    "href": "posts/03-1-netedit/index.html#creating-intersections",
+    "title": "03.1: Create networks by hand in netedit",
+    "section": "Creating intersections",
+    "text": "Creating intersections\nCreate a traffic light intersection in netedit and generate multiple XML files:\n\n\nUse netconvert to make a network file\nMake sure your working directory is sumo_workshop\ncd module1/02-netedit\nnetconvert `\n  --node-files=intersection.nod.xml `\n  --edge-files=intersection.edg.xml `\n  --connection-files=intersection.con.xml `\n  --tllogic-files=intersection.tll.xml `\n  --output-file=intersection.net.xml `\n  --no-turnarounds true"
+  },
+  {
+    "objectID": "posts/03-1-netedit/index.html#convert-an-intersection-to-a-roundabout",
+    "href": "posts/03-1-netedit/index.html#convert-an-intersection-to-a-roundabout",
+    "title": "03.1: Create networks by hand in netedit",
+    "section": "Convert an intersection to a roundabout",
+    "text": "Convert an intersection to a roundabout\nSpecify the radius of the traffic light junction (node) in meters and then right click and select convert to roundabout from the dropdown menu."
+  },
+  {
+    "objectID": "posts/03-1-netedit/index.html#create-a-highway-section-with-ramps",
+    "href": "posts/03-1-netedit/index.html#create-a-highway-section-with-ramps",
+    "title": "03.1: Create networks by hand in netedit",
+    "section": "Create a highway section with ramps",
+    "text": "Create a highway section with ramps\n\nnetconvert `\n  --node-files=highway.nod.xml `\n  --edge-files=highway.edg.xml `\n  --connection-files=highway.con.xml `\n  --output-file=highway.net.xml `\n  --no-turnarounds true\n\nAnatomy of a SUMO network\nClick on the slide below and press the ‘f’ key to make it full screen. Then press the right arrow key repeatedly to see the anatomy of a simple highway network in SUMO."
+  },
+  {
     "objectID": "posts/01-setup/index.html",
     "href": "posts/01-setup/index.html",
     "title": "01: Setup",
@@ -82,33 +110,5 @@
     "title": "02: The Whole Game",
     "section": "View the contents of module1\\01-theWholeGame\\<new folder with date>",
     "text": "View the contents of module1\\01-theWholeGame\\&lt;new folder with date&gt;\nRelevant files:\n\nosm.net.xml.gz: Network\nosm.passenger.trips.xml and osm.trucks.trips.xml: Individual trips at random road segments\nosm.sumocfg: Configuration file that specifies the network, route (trips), output, and other files\n\n\n← Setup\n🏠 All Lessons\nNext: NetEdit →"
-  },
-  {
-    "objectID": "posts/03-1-netedit/index.html",
-    "href": "posts/03-1-netedit/index.html",
-    "title": "03.1: Create networks by hand in netedit",
-    "section": "",
-    "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world"
-  },
-  {
-    "objectID": "posts/03-1-netedit/index.html#creating-intersections",
-    "href": "posts/03-1-netedit/index.html#creating-intersections",
-    "title": "03.1: Create networks by hand in netedit",
-    "section": "Creating intersections",
-    "text": "Creating intersections\nCreate a traffic light intersection in netedit and generate multiple XML files:\n\n\nUse netconvert to make a network file\nMake sure your working directory is sumo_workshop\ncd module1/02-netedit\nnetconvert `\n  --node-files=intersection.nod.xml `\n  --edge-files=intersection.edg.xml `\n  --connection-files=intersection.con.xml `\n  --tllogic-files=intersection.tll.xml `\n  --output-file=intersection.net.xml `\n  --no-turnarounds true"
-  },
-  {
-    "objectID": "posts/03-1-netedit/index.html#convert-an-intersection-to-a-roundabout",
-    "href": "posts/03-1-netedit/index.html#convert-an-intersection-to-a-roundabout",
-    "title": "03.1: Create networks by hand in netedit",
-    "section": "Convert an intersection to a roundabout",
-    "text": "Convert an intersection to a roundabout\nSpecify the radius of the traffic light junction (node) in meters and then right click and select convert to roundabout from the dropdown menu."
-  },
-  {
-    "objectID": "posts/03-1-netedit/index.html#create-a-highway-section-with-ramps",
-    "href": "posts/03-1-netedit/index.html#create-a-highway-section-with-ramps",
-    "title": "03.1: Create networks by hand in netedit",
-    "section": "Create a highway section with ramps",
-    "text": "Create a highway section with ramps\n\nnetconvert `\n  --node-files=highway.nod.xml `\n  --edge-files=highway.edg.xml `\n  --connection-files=highway.con.xml `\n  --output-file=highway.net.xml `\n  --no-turnarounds true\n\nAnatomy of a SUMO network\nClick on the slide below and press the ‘f’ key to make it full screen. Then press the right arrow key repeatedly to see the anatomy of a simple highway network in SUMO."
   }
 ]
