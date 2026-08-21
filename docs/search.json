@@ -7,32 +7,39 @@
     "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world\n      \n    \n    \n      \n        \n        \n        \n        \n      \n    \n    \n      \n    \n  \n\n\n\n\n\nOnce a network and a demand file exist, a .sumocfg file ties them together. You can run the simulation headless from the command line for speed, or open it in sumo-gui — the interface this site’s chrome is modeled on — to watch traffic move through the network.\n\n\n\n\n\n\nNoteKey concepts\n\n\n\n\nPlay / Pause / Step advance the simulation clock\nThe delay slider slows playback so fast simulations are easier to watch\ntripinfo-output logs each vehicle’s travel time, waiting time, and route length\nColoring schemes can shade vehicles or edges by speed, occupancy, or fuel use\n\n\n\n\n\n\n\n\n\nTipTip\n\n\n\nRun a short simulation first to sanity-check your setup before scaling up to a full day of demand.\n\n\n\n← Traffic Demand & Routes\n🏠 All Lessons\nNext"
   },
   {
-    "objectID": "posts/03-1-netedit/index.html",
-    "href": "posts/03-1-netedit/index.html",
-    "title": "03.1: Create networks by hand in netedit",
+    "objectID": "posts/03-3-taz/index.html",
+    "href": "posts/03-3-taz/index.html",
+    "title": "03.3: TAZ",
+    "section": "",
+    "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world\n      \n    \n    \n      \n        \n        \n        \n        \n      \n    \n    \n      \n    \n  \n\n\n\n\n\nMake sure your current working directory is sumo_workshop.\n$env:PROJ_LIB=\"C:\\Program Files (x86)\\Eclipse\\Sumo\\data\\proj\\\"\npolyconvert --shapefile-prefix \"data/durham_taz/durham_taz\" `\n     --shapefile.guess-projection true `\n     --shapefile.traditional-axis-mapping true `\n     --shapefile.id-column pd `\n     -n \"module1/03-osm/map.net.xml\" -o \"module1/04-taz/taz_polygons.poly.xml\"\nuv run \"$env:SUMO_HOME/tools/edgesInDistricts.py\" `\n    -n \"module1/03-osm/map.net.xml\" `\n    -t \"module1/04-taz/taz_polygons.poly.xml\" `\n    -o \"module1/04-taz/TAZ.xml\"\nnetedit --sumo-net-file \"module1/03-osm/map.net.xml\" `\n    --additional-files \"module1/04-taz/taz_polygons.poly.xml\""
+  },
+  {
+    "objectID": "posts/02-whole_game/index.html",
+    "href": "posts/02-whole_game/index.html",
+    "title": "02: The Whole Game",
     "section": "",
     "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world"
   },
   {
-    "objectID": "posts/03-1-netedit/index.html#creating-intersections",
-    "href": "posts/03-1-netedit/index.html#creating-intersections",
-    "title": "03.1: Create networks by hand in netedit",
-    "section": "Creating intersections",
-    "text": "Creating intersections\nCreate a traffic light intersection in netedit and generate multiple XML files:\n\n\nUse netconvert to make a network file\nMake sure your working directory is sumo_workshop\ncd module1/02-netedit\nnetconvert `\n  --node-files=intersection.nod.xml `\n  --edge-files=intersection.edg.xml `\n  --connection-files=intersection.con.xml `\n  --tllogic-files=intersection.tll.xml `\n  --output-file=intersection.net.xml `\n  --no-turnarounds true"
+    "objectID": "posts/02-whole_game/index.html#osm-web-wizard",
+    "href": "posts/02-whole_game/index.html#osm-web-wizard",
+    "title": "02: The Whole Game",
+    "section": "OSM Web Wizard",
+    "text": "OSM Web Wizard\nOSM stands for Open Street Map and it lets you export network data at no cost (with limitations). OSM Web Wizard is a utility developed by the SUMO team to let users develop a quick simulation with the following features:\n\nSelect a medium sized desired area\nImport satellite background, car network, and public transport network with network details\nSpecify Left-hand or Right-hand traffic (default)\nSpecify random traffic that could be all cars and/or other traffic such as trucks, buses, pedestrians, trains, etc.\n\n\nSteps to generate an example scenario\nOpen the sumo_workshop folder in Positron.\n\nRun the following in Powershell:\n\ncd .\\module1\\01-theWholeGame\\\nuv run \"$env:SUMO_HOME\\tools\\osmWebWizard.py\"\nThat will open the wizard in your default browser.\n\nIn the wizard tab, search for Oshawa, Ontario or any desired area\nClick ‘Select Area’ checkbox and select a small desired area\nCheck only ‘Car-only Network’ and ‘Satellite background’\nGo to Vehicles tab, check ‘Cars’ and ‘Trucks’ and keep the default values of the through traffic factor & count\nIn the Road-Types tab, check Highway with all subcategories and uncheck everything else\nClick the Generate Scenario button\n\nIf the map data download is successful, all files will be saved to the module1\\01-theWholeGame\\&lt;new folder with date&gt; folder and SUMO window will launch.\nClose the wizard tab in your browser and run Ctrl + C in the terminal to stop.\n\n\nRun the simulation\nThe previous step would open SUMO for you. If it didn’t or you closed SUMO, you may open it again by double clicking the osm.sumocfg file in the module1\\01-theWholeGame\\&lt;new folder with date&gt; folder.\n\nIncrease the Delay (ms) to &gt; 500 so you’d be able to see the traffic in slow motion\nClick the Run button (looks like the Play button)\nIf vehicles are not seen right away, click on the Locate Structures button (question mark icon) and then click the Locate Vehicles button. Select any vehicle and the click Center or Track\nYou may stop the simulation at any time"
   },
   {
-    "objectID": "posts/03-1-netedit/index.html#convert-an-intersection-to-a-roundabout",
-    "href": "posts/03-1-netedit/index.html#convert-an-intersection-to-a-roundabout",
-    "title": "03.1: Create networks by hand in netedit",
-    "section": "Convert an intersection to a roundabout",
-    "text": "Convert an intersection to a roundabout\nSpecify the radius of the traffic light junction (node) in meters and then right click and select convert to roundabout from the dropdown menu."
+    "objectID": "posts/02-whole_game/index.html#view-the-contents-of-module101-thewholegamenew-folder-with-date",
+    "href": "posts/02-whole_game/index.html#view-the-contents-of-module101-thewholegamenew-folder-with-date",
+    "title": "02: The Whole Game",
+    "section": "View the contents of module1\\01-theWholeGame\\<new folder with date>",
+    "text": "View the contents of module1\\01-theWholeGame\\&lt;new folder with date&gt;\nRelevant files:\n\nosm.net.xml.gz: Network\nosm.passenger.trips.xml and osm.trucks.trips.xml: Individual trips at random road segments\nosm.sumocfg: Configuration file that specifies the network, route (trips), output, and other files\n\n\n← Setup\n🏠 All Lessons\nNext: NetEdit →"
   },
   {
-    "objectID": "posts/03-1-netedit/index.html#create-a-highway-section-with-ramps",
-    "href": "posts/03-1-netedit/index.html#create-a-highway-section-with-ramps",
-    "title": "03.1: Create networks by hand in netedit",
-    "section": "Create a highway section with ramps",
-    "text": "Create a highway section with ramps\n\nnetconvert `\n  --node-files=highway.nod.xml `\n  --edge-files=highway.edg.xml `\n  --connection-files=highway.con.xml `\n  --output-file=highway.net.xml `\n  --no-turnarounds true\n\nAnatomy of a SUMO network\nClick on the slide below and press the ‘f’ key to make it full screen. Then press the right arrow key repeatedly to see the anatomy of a simple highway network in SUMO."
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "SUMO Lessons",
+    "section": "",
+    "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world\n      \n    \n    \n      \n        \n        \n        \n        \n      \n    \n    \n      \n    \n  \n\n\n\n\n\nA course on SUMO (Simulation of Urban MObility). Pick a lesson below, or open it from the File menu above at any time.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n01: Setup\n\n\nInstall SUMO, Python, and uv\n\n\n\n\n\n\n\n\n\n\n\n\n02: The Whole Game\n\n\nRunning your first simulation\n\n\n\n\n\n\n\n\n\n\n\n\n03.1: Create networks by hand in netedit\n\n\nIntersections and Highways\n\n\n\n\n\n\n\n\n\n\n\n\n03.2: Export networks from Open Street Map\n\n\nOverpass API\n\n\n\n\n\n\n\n\n\n\n\n\n03.3: TAZ\n\n\nOverpass API\n\n\n\n\n\n\n\n\n\n\n\n\n10-Running the Simulation\n\n\nTying it together with a .sumocfg and reading the output.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/01-setup/index.html",
@@ -46,7 +53,7 @@
     "href": "posts/01-setup/index.html#install-sumo",
     "title": "01: Setup",
     "section": "1 Install SUMO",
-    "text": "1 Install SUMO\nVisit the official website to download SUMO. During installation accept the defaults. Then check that it is installed by searching sumo-gui."
+    "text": "1 Install SUMO\nSUMO is available to download on the official website. However, for the Traffic Analysis Zone (TAZ) part covered later in the workshop, we need to isntall SUMO with some extras. You may install SUMO with extras here.\nDuring installation accept the defaults. Then check that it is installed by searching sumo-gui."
   },
   {
     "objectID": "posts/01-setup/index.html#create-sumo_home-system-variable",
@@ -84,31 +91,45 @@
     "text": "6 Download and sync workshop folder\n\nDownload the zipped folder sumo_workshop from GitHub and extract it. You can download it by clicking the dropdown menu of the green code button and clicking Download ZIP. Make sure to extract it by right clicking the zipped folder and click Extract All.\nOpen Positron, click Open &gt; Open Folder and select the extracted folder\nYou may see a dialog box in Positron asking if yoy trust the authors. Select yes I trust the authors. Dismiss any notifications.\nRun uv sync in terminal. If you don’t see the terminal, click Ctrl + Shift + backtick. If the command uv sync does not work, restart Positron and try again.\nOnce Python and packages are installed, you will see .venv created in Positron’s files explorer. See if Python is working by clicking Start Session at the top-right of Positron and selecting Python 3.14.x (uv: sumo-workshop). That would start Python in a console window (you may have to click allow in a different window first). Run the following Python command:\n\n1 + 1\nIf the code above runs, you’re all set!\n\n← Previous\n🏠 All Lessons\nNext: The Whole Game →"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "SUMO Lessons",
-    "section": "",
-    "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world\n      \n    \n    \n      \n        \n        \n        \n        \n      \n    \n    \n      \n    \n  \n\n\n\n\n\nA course on SUMO (Simulation of Urban MObility). Pick a lesson below, or open it from the File menu above at any time.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n01: Setup\n\n\nInstall SUMO, Python, and uv\n\n\n\n\n\n\n\n\n\n\n\n\n02: The Whole Game\n\n\nRunning your first simulation\n\n\n\n\n\n\n\n\n\n\n\n\n03.1: Create networks by hand in netedit\n\n\nIntersections and Highways\n\n\n\n\n\n\n\n\n\n\n\n\n10-Running the Simulation\n\n\nTying it together with a .sumocfg and reading the output.\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "posts/02-whole_game/index.html",
-    "href": "posts/02-whole_game/index.html",
-    "title": "02: The Whole Game",
+    "objectID": "posts/03-1-netedit/index.html",
+    "href": "posts/03-1-netedit/index.html",
+    "title": "03.1: Create networks by hand in netedit",
     "section": "",
     "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world"
   },
   {
-    "objectID": "posts/02-whole_game/index.html#osm-web-wizard",
-    "href": "posts/02-whole_game/index.html#osm-web-wizard",
-    "title": "02: The Whole Game",
-    "section": "OSM Web Wizard",
-    "text": "OSM Web Wizard\nOSM stands for Open Street Map and it lets you export network data at no cost (with limitations). OSM Web Wizard is a utility developed by the SUMO team to let users develop a quick simulation with the following features:\n\nSelect a medium sized desired area\nImport satellite background, car network, and public transport network with network details\nSpecify Left-hand or Right-hand traffic (default)\nSpecify random traffic that could be all cars and/or other traffic such as trucks, buses, pedestrians, trains, etc.\n\n\nSteps to generate an example scenario\nOpen the sumo_workshop folder in Positron.\n\nRun the following in Powershell:\n\ncd .\\module1\\01-theWholeGame\\\nuv run \"$env:SUMO_HOME\\tools\\osmWebWizard.py\"\nThat will open the wizard in your default browser.\n\nIn the wizard tab, search for Oshawa, Ontario or any desired area\nClick ‘Select Area’ checkbox and select a small desired area\nCheck only ‘Car-only Network’ and ‘Satellite background’\nGo to Vehicles tab, check ‘Cars’ and ‘Trucks’ and keep the default values of the through traffic factor & count\nIn the Road-Types tab, check Highway with all subcategories and uncheck everything else\nClick the Generate Scenario button\n\nIf the map data download is successful, all files will be saved to the module1\\01-theWholeGame\\&lt;new folder with date&gt; folder and SUMO window will launch.\nClose the wizard tab in your browser and run Ctrl + C in the terminal to stop.\n\n\nRun the simulation\nThe previous step would open SUMO for you. If it didn’t or you closed SUMO, you may open it again by double clicking the osm.sumocfg file in the module1\\01-theWholeGame\\&lt;new folder with date&gt; folder.\n\nIncrease the Delay (ms) to &gt; 500 so you’d be able to see the traffic in slow motion\nClick the Run button (looks like the Play button)\nIf vehicles are not seen right away, click on the Locate Structures button (question mark icon) and then click the Locate Vehicles button. Select any vehicle and the click Center or Track\nYou may stop the simulation at any time"
+    "objectID": "posts/03-1-netedit/index.html#creating-intersections",
+    "href": "posts/03-1-netedit/index.html#creating-intersections",
+    "title": "03.1: Create networks by hand in netedit",
+    "section": "Creating intersections",
+    "text": "Creating intersections\nCreate a traffic light intersection in netedit and generate multiple XML files:\n\n\nUse netconvert to make a network file\nMake sure your working directory is sumo_workshop\ncd module1/02-netedit\nnetconvert `\n  --node-files=intersection.nod.xml `\n  --edge-files=intersection.edg.xml `\n  --connection-files=intersection.con.xml `\n  --tllogic-files=intersection.tll.xml `\n  --output-file=intersection.net.xml `\n  --no-turnarounds true"
   },
   {
-    "objectID": "posts/02-whole_game/index.html#view-the-contents-of-module101-thewholegamenew-folder-with-date",
-    "href": "posts/02-whole_game/index.html#view-the-contents-of-module101-thewholegamenew-folder-with-date",
-    "title": "02: The Whole Game",
-    "section": "View the contents of module1\\01-theWholeGame\\<new folder with date>",
-    "text": "View the contents of module1\\01-theWholeGame\\&lt;new folder with date&gt;\nRelevant files:\n\nosm.net.xml.gz: Network\nosm.passenger.trips.xml and osm.trucks.trips.xml: Individual trips at random road segments\nosm.sumocfg: Configuration file that specifies the network, route (trips), output, and other files\n\n\n← Setup\n🏠 All Lessons\nNext: NetEdit →"
+    "objectID": "posts/03-1-netedit/index.html#convert-an-intersection-to-a-roundabout",
+    "href": "posts/03-1-netedit/index.html#convert-an-intersection-to-a-roundabout",
+    "title": "03.1: Create networks by hand in netedit",
+    "section": "Convert an intersection to a roundabout",
+    "text": "Convert an intersection to a roundabout\nSpecify the radius of the traffic light junction (node) in meters and then right click and select convert to roundabout from the dropdown menu."
+  },
+  {
+    "objectID": "posts/03-1-netedit/index.html#create-a-highway-section-with-ramps",
+    "href": "posts/03-1-netedit/index.html#create-a-highway-section-with-ramps",
+    "title": "03.1: Create networks by hand in netedit",
+    "section": "Create a highway section with ramps",
+    "text": "Create a highway section with ramps\n\nnetconvert `\n  --node-files=highway.nod.xml `\n  --edge-files=highway.edg.xml `\n  --connection-files=highway.con.xml `\n  --output-file=highway.net.xml `\n  --no-turnarounds true\n\nAnatomy of a SUMO network\nClick on the slide below and press the ‘f’ key to make it full screen. Then press the right arrow key repeatedly to see the anatomy of a simple highway network in SUMO."
+  },
+  {
+    "objectID": "posts/03-2-osm/index.html",
+    "href": "posts/03-2-osm/index.html",
+    "title": "03.2: Export networks from Open Street Map",
+    "section": "",
+    "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world\n      \n    \n    \n      \n        \n        \n        \n        \n      \n    \n    \n      \n    \n  \n\n\n\n\n\nBounding box: xmin: -79.328 ymin: 43.79446 xmax: -78.43695 ymax: 44.51701\n\nRename map to map.osm.\nMake sure your current working directory is sumo_workshop.\nnetconvert --osm data/osm/map.osm -o module1/03-osm/map.net.xml `\n     --ramps.guess `\n     --junctions.join `\n     --junctions.join-dist 15 `\n     --tls.guess-signals `\n     --tls.discard-simple `\n     --tls.join `\n     --tls.default-type static `\n     -t \"$env:SUMO_HOME/data/typemap/osmNetconvert.typ.xml\" `\n     --output.street-names `\n     --output.original-names `\n     --keep-edges.by-vclass passenger `\n     --remove-edges.isolated `\n     --geometry.remove `\n     --geometry.max-segment-length 50 `\n     --edges.join `\n     --junctions.corner-detail 5 `\n     --no-internal-links\nnetconvert --osm data/osm/map.osm -o module1/03-osm/map_highway.net.xml `\n     --ramps.guess `\n     --junctions.join `\n     --junctions.join-dist 15 `\n     --tls.guess-signals `\n     --tls.discard-simple `\n     --tls.join `\n     --tls.default-type static `\n     -t \"$env:SUMO_HOME/data/typemap/osmNetconvert.typ.xml\" `\n     --output.street-names `\n     --output.original-names `\n     --keep-edges.by-vclass passenger `\n     --remove-edges.isolated `\n     --geometry.remove `\n     --geometry.max-segment-length 50 `\n     --edges.join `\n     --junctions.corner-detail 5 `\n     --no-internal-links `\n     --keep-edges.by-type highway.motorway,highway.trunk,highway.primary,highway.secondary,highway.tertiary"
+  },
+  {
+    "objectID": "posts/04/index.html",
+    "href": "posts/04/index.html",
+    "title": "SUMO Lessons",
+    "section": "",
+    "text": "SUMO Lessons\n      \n    \n    \n      −\n      □\n      ✕\n    \n  \n\n  \n  \n    \n      File\n      \n        All Lessons\n        \n        Lessons\n        01 - Setup\n        02 - The Whole Game\n        03.1 - Creating Networks: NetEdit\n        03.2 - Creating Networks: OSM and TAZ\n      \n    \n    Edit\n    Settings\n    Locate\n    Simulation\n    Window\n    Language\n    Help\n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      Time:\n      00.000\n    \n\n    \n      Delay (ms):\n      0\n      \n    \n\n    \n      Scale Traffic:\n      1\n      \n        \n      \n    \n  \n\n  \n  \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n    \n      \n    \n\n    \n\n    \n      real world\n      \n    \n    \n      \n        \n        \n        \n        \n      \n    \n    \n      \n    \n  \n\n\n\n\n\nod2trips --taz-files module1/04-taz/TAZ.xml `\n    --od-matrix-files data/tts_2011_ampeak_durham8.od `\n    -o module1/05-demand/durham_trips_am.trips.xml `\n    --prefix veh --spread.uniform\nduarouter -n module1/03-osm/map.net.xml `\n    --route-files module1/05-demand/durham_trips_am.trips.xml `\n    -o module1/05-demand/durham_routes_am.rou.xml `\n    --ignore-errors --routing-algorithm CH\nsumo-gui -n module1/03-osm/map.net.xml `\n    -r module1/05-demand/durham_routes_am.rou.xml `\n    -a module1/04-taz/taz_polygons.poly.xml"
   }
 ]

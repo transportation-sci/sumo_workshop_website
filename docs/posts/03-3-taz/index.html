@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="dcterms.date" content="2026-08-21">
-<meta name="description" content="Tying it together with a .sumocfg and reading the output.">
+<meta name="description" content="Overpass API">
 
-<title>10-Running the Simulation – SUMO Lessons</title>
+<title>03.3: TAZ – SUMO Lessons</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -27,6 +27,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -216,13 +251,12 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">10-Running the Simulation</h1>
-<p class="subtitle lead">Lesson 4 of 4</p>
+<h1 class="title">03.3: TAZ</h1>
 </div>
 
 <div>
   <div class="description">
-    Tying it together with a .sumocfg and reading the output.
+    Overpass API
   </div>
 </div>
 
@@ -245,43 +279,19 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Once a network and a demand file exist, a <code>.sumocfg</code> file ties them together. You can run the simulation headless from the command line for speed, or open it in <strong>sumo-gui</strong> — the interface this site’s chrome is modeled on — to watch traffic move through the network.</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Key concepts">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Key concepts
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li>Play / Pause / Step advance the simulation clock</li>
-<li>The delay slider slows playback so fast simulations are easier to watch</li>
-<li><code>tripinfo-output</code> logs each vehicle’s travel time, waiting time, and route length</li>
-<li>Coloring schemes can shade vehicles or edges by speed, occupancy, or fuel use</li>
-</ul>
-</div>
-</div>
-<div class="callout callout-style-default callout-tip callout-titled" title="Tip">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Run a short simulation first to sanity-check your setup before scaling up to a full day of demand.</p>
-</div>
-</div>
-<div class="lesson-nav">
-<p><a href="../lesson-3-traffic-demand/index.qmd">← Traffic Demand &amp; Routes</a></p>
-<p><a href="../../index.html" class="primary">🏠 All Lessons</a></p>
-<p><span class="disabled">Next</span></p>
-</div>
+<p>Make sure your current working directory is <code>sumo_workshop</code>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">$env</span><span class="op">:</span><span class="va">PROJ_LIB</span><span class="op">=</span><span class="st">"C:\Program Files (x86)\Eclipse\Sumo\data\proj\"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>polyconvert <span class="op">--</span>shapefile-prefix <span class="st">"data/durham_taz/durham_taz"</span> `</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>shapefile<span class="op">.</span><span class="fu">guess</span><span class="op">-</span>projection true `</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>shapefile<span class="op">.</span><span class="fu">traditional</span><span class="op">-</span>axis-mapping true `</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>shapefile<span class="op">.</span><span class="fu">id</span><span class="op">-</span>column pd `</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>     <span class="op">-</span>n <span class="st">"module1/03-osm/map.net.xml"</span> <span class="op">-</span>o <span class="st">"module1/04-taz/taz_polygons.poly.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>uv run <span class="st">"</span><span class="va">$env</span><span class="op">:</span><span class="va">SUMO_HOME</span><span class="st">/tools/edgesInDistricts.py"</span> `</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span>n <span class="st">"module1/03-osm/map.net.xml"</span> `</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span>t <span class="st">"module1/04-taz/taz_polygons.poly.xml"</span> `</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span>o <span class="st">"module1/04-taz/TAZ.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>netedit <span class="op">--</span>sumo-net-file <span class="st">"module1/03-osm/map.net.xml"</span> `</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">--</span>additional-files <span class="st">"module1/04-taz/taz_polygons.poly.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 
