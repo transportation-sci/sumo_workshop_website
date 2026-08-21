@@ -15,7 +15,9 @@ simulation package designed to handle large networks.
 
 ## Install SUMO
 
-Visit the [official website](https://eclipse.dev/sumo/){target="_blank"} to download SUMO. During installation accept the defaults. Then check that it is installed by searching `sumo-gui`.
+SUMO is available to download on the [official website](https://eclipse.dev/sumo/){target="_blank"}. However, for the Traffic Analysis Zone (TAZ) part covered later in the workshop, we need to isntall SUMO with some extras. You may install SUMO with extras [here](https://sumo.dlr.de/releases/1.27.1/sumo-win64extra-1.27.1.msi).
+
+During installation accept the defaults. Then check that it is installed by searching `sumo-gui`.
 
 ## Create `SUMO_HOME` system variable 
 

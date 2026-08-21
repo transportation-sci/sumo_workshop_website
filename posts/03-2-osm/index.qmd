@@ -1,0 +1,60 @@
+---
+title: "03.2: Export networks from Open Street Map"
+description: "Overpass API"
+date: today
+image: /assets/roundabout.jpg
+page-layout: full
+title-block-banner: false
+---
+
+Bounding box:  xmin: -79.328 ymin: 43.79446 xmax: -78.43695 ymax: 44.51701
+
+![](/assets/osm.jpg)
+
+Rename `map` to `map.osm`.
+
+Make sure your current working directory is `sumo_workshop`.
+
+```powershell
+netconvert --osm data/osm/map.osm -o module1/03-osm/map.net.xml `
+     --ramps.guess `
+     --junctions.join `
+     --junctions.join-dist 15 `
+     --tls.guess-signals `
+     --tls.discard-simple `
+     --tls.join `
+     --tls.default-type static `
+     -t "$env:SUMO_HOME/data/typemap/osmNetconvert.typ.xml" `
+     --output.street-names `
+     --output.original-names `
+     --keep-edges.by-vclass passenger `
+     --remove-edges.isolated `
+     --geometry.remove `
+     --geometry.max-segment-length 50 `
+     --edges.join `
+     --junctions.corner-detail 5 `
+     --no-internal-links
+```
+
+
+```powershell
+netconvert --osm data/osm/map.osm -o module1/03-osm/map_highway.net.xml `
+     --ramps.guess `
+     --junctions.join `
+     --junctions.join-dist 15 `
+     --tls.guess-signals `
+     --tls.discard-simple `
+     --tls.join `
+     --tls.default-type static `
+     -t "$env:SUMO_HOME/data/typemap/osmNetconvert.typ.xml" `
+     --output.street-names `
+     --output.original-names `
+     --keep-edges.by-vclass passenger `
+     --remove-edges.isolated `
+     --geometry.remove `
+     --geometry.max-segment-length 50 `
+     --edges.join `
+     --junctions.corner-detail 5 `
+     --no-internal-links `
+     --keep-edges.by-type highway.motorway,highway.trunk,highway.primary,highway.secondary,highway.tertiary
+```

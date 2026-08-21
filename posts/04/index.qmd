@@ -1,0 +1,21 @@
+
+
+```powershell
+od2trips --taz-files module1/04-taz/TAZ.xml `
+    --od-matrix-files data/tts_2011_ampeak_durham8.od `
+    -o module1/05-demand/durham_trips_am.trips.xml `
+    --prefix veh --spread.uniform
+```
+
+```powershell
+duarouter -n module1/03-osm/map.net.xml `
+    --route-files module1/05-demand/durham_trips_am.trips.xml `
+    -o module1/05-demand/durham_routes_am.rou.xml `
+    --ignore-errors --routing-algorithm CH
+```
+
+```powershell
+sumo-gui -n module1/03-osm/map.net.xml `
+    -r module1/05-demand/durham_routes_am.rou.xml `
+    -a module1/04-taz/taz_polygons.poly.xml
+```

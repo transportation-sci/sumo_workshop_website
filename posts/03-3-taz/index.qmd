@@ -1,0 +1,35 @@
+---
+title: "03.3: TAZ"
+description: "Overpass API"
+date: today
+image: /assets/roundabout.jpg
+page-layout: full
+title-block-banner: false
+---
+
+Make sure your current working directory is `sumo_workshop`.
+
+```powershell
+$env:PROJ_LIB="C:\Program Files (x86)\Eclipse\Sumo\data\proj\"
+```
+
+```powershell
+polyconvert --shapefile-prefix "data/durham_taz/durham_taz" `
+     --shapefile.guess-projection true `
+     --shapefile.traditional-axis-mapping true `
+     --shapefile.id-column pd `
+     -n "module1/03-osm/map.net.xml" -o "module1/04-taz/taz_polygons.poly.xml"
+```
+
+```powershell
+uv run "$env:SUMO_HOME/tools/edgesInDistricts.py" `
+    -n "module1/03-osm/map.net.xml" `
+    -t "module1/04-taz/taz_polygons.poly.xml" `
+    -o "module1/04-taz/TAZ.xml"
+```
+
+
+```powershell
+netedit --sumo-net-file "module1/03-osm/map.net.xml" `
+    --additional-files "module1/04-taz/taz_polygons.poly.xml"
+```
