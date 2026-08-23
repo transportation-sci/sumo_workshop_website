@@ -1,19 +1,80 @@
 ---
-title: "03.2: Export networks from Open Street Map"
-description: "Overpass API"
+title: "03.2: Import networks from Open Street Map"
+description: "Case Study: Simulating Durham Region (Part 1)"
 date: today
-image: /assets/roundabout.jpg
+image: /assets/durham_taz_shp.png
 page-layout: full
 title-block-banner: false
 ---
 
-Bounding box:  xmin: -79.328 ymin: 43.79446 xmax: -78.43695 ymax: 44.51701
+::: {.callout-note title="Case Study"}
+This post is part of the **Case Study: Simulating Durham Region**. In this case study, we get the relevant data and road network, create Traffic Analysis Zones (TAZ)s, generate trips based on origin-desitination data, create routes, and run simulation.
+
+This post covers:
+
+- Get Data: Origin-Destination Trip Matrix and Zone shapefile from UToronto's Transportation Tomorrow Survey (TTS) project
+- Export Open Street Map (OSM) network
+- Convert OSM network to SUMO compatible network
+:::
+
+## Data
+
+* [2011 Origin-Destination Trip Matrix (6 - 9 AM) for 36 municipalities](https://dmg.utoronto.ca/wp-content/uploads/2022/09/2011_gtha_matrices.pdf) 
+
+To keep the network and number of trips small in this case-study, we focus on the 8 municipalities in the Brock/Durham region:
+
+![](/assets/od_trip_matrix_8_municipalities.png)
+
+* [2006 Zone Boundaries](https://dmg.utoronto.ca/wp-content/uploads/2025/01/tts_2006zn_shp.zip)
+
+We use the zone boundaries relevant to the 2011 trip matrix.
+
+![](/assets/zones.png)
+
+This file contains a column `pd` that includes planning districts and also corresponding polygon geometries. According to the [2011 TTS Data Guide](https://dmg.utoronto.ca/pdf/tts/2011/dataguide2011.pdf), `pd` of 17-24 belong to the Durham region which is the area of interest in our case-study. Therefore, we dissolve the original shapefile into 8 polygons only:
+
+```{r}
+#| code-fold: true
+#| code-summary: "Click to see the code"
+#| eval: false
+
+# This is R code.
+library(sf)
+library(dplyr)
+foo <- st_read("data/tts_2006zn_shp/tts_2006zn.shp")
+foo <- st_make_valid(foo)
+durham <- foo %>% filter(pd %in% 17:24)
+durham_taz <- durham %>%
+  group_by(pd) %>%
+  summarise(geometry = st_union(geometry), .groups = "drop") %>%
+  st_cast("POLYGON") %>%
+  mutate(area = st_area(geometry)) %>%
+  group_by(pd) %>%
+  slice_max(area, n = 1) %>%
+  ungroup() %>%
+  select(-area) %>%
+  st_simplify(dTolerance = 100, preserveTopology = TRUE)
+st_write(durham_taz, "data/durham_taz/durham_taz.shp", delete_layer = TRUE)
+
+## For bounding box:
+durham_taz |> st_transform(4326)
+```
+
+![](/assets/durham_taz_shp.png)
+
+## Download map from OSM
+
+[OSM](https://www.openstreetmap.org/) lets you download road network by selecting a desired area or providing a bounding box. For the Durham region zone boundaries, the bounding box is:
+
+> Bounding box:  xmin: -79.33 ymin: 43.80 xmax: -78.44 ymax: 44.51
+
+Click Export from the navigation bar on the OSM page, enter the bounding box coordinates and then click the **Overpass API** below to download the network. The file will be downloaded as `map`, rename it as `map.osm`.
 
 ![](/assets/osm.jpg)
 
-Rename `map` to `map.osm`.
+## Convert `map.osm` to SUMO compatible `map.net.xml`
 
-Make sure your current working directory is `sumo_workshop`.
+Make sure your current working directory is `sumo_workshop`. Now run this in the powershell terminal:
 
 ```powershell
 netconvert --osm data/osm/map.osm -o module1/03-osm/map.net.xml `
@@ -36,25 +97,42 @@ netconvert --osm data/osm/map.osm -o module1/03-osm/map.net.xml `
      --no-internal-links
 ```
 
+The only required command here is `netconvert --osm data/osm/map.osm -o module1/03-osm/map.net.xml`. The other [options](https://sumo.dlr.de/docs/netconvert.html#options) used here are described as follows:
+
+| Flag | Description |
+| :--- | :--- |
+| `--osm data/osm/map.osm` | **Input**: Reads the OpenStreetMap network from the specified file (`map.osm`). |
+| `-o module1/03-osm/map.net.xml` | **Output**: Writes the generated SUMO network to the specified file (`map.net.xml`). |
+| `--ramps.guess` | **Processing**: Enables the guessing and marking of highway on-ramps and off-ramps. |
+| `--junctions.join` | **Processing**: Joins junctions that are very close to each other, which is often recommended for OSM imports to simplify the network. |
+| `--junctions.join-dist 15` | **Processing**: Sets the maximal distance (in meters) for joining junctions. The default is 10; this sets it to 15. |
+| `--tls.guess-signals` | **TLS Building**: Interprets nodes surrounding an intersection as signal positions for a larger traffic light system. This is a typical pattern for OSM-derived networks. |
+| `--tls.discard-simple` | **TLS Building**: Does not instantiate traffic lights at simple, geometry-like nodes that are loaded from non-plain-XML formats (like OSM). |
+| `--tls.join` | **TLS Building**: Tries to cluster traffic-light-controlled nodes that are close together into a single logic. |
+| `--tls.default-type static` | **TLS Building**: Sets the default traffic light algorithm for nodes with unspecified types to `static` (fixed-time control). |
+| `-t "$env:SUMO_HOME/data/typemap/osmNetconvert.typ.xml"` | **Input**: Reads XML type definitions from the specified file. This typemap is crucial for mapping OSM `highway` types to SUMO edge attributes like speed and number of lanes. |
+| `--output.street-names` | **Output**: Includes street names in the output `.net.xml` file if they are available in the input data. |
+| `--output.original-names` | **Output**: Writes the original names (e.g., from OSM) as a parameter in the output file. |
+| `--keep-edges.by-vclass passenger` | **Edge Removal**: Only keeps edges that allow the vehicle class `passenger`. All other edges (e.g., railways, pedestrian paths) are removed from the network. |
+| `--remove-edges.isolated` | **Edge Removal**: Removes edges that are isolated and not connected to the rest of the network. |
+| `--geometry.remove` | **Processing**: Replaces nodes that only serve to define edge geometry with geometry points, effectively joining the edges to remove unnecessary nodes. |
+| `--geometry.max-segment-length 50` | **Processing**: Splits long geometry segments so that no segment is longer than 50 meters. This can improve accuracy and visual appearance. |
+| `--edges.join` | **Processing**: Merges edges that connect the same two nodes and are geometrically close to each other. |
+| `--junctions.corner-detail 5` | **Junctions**: Generates 5 intermediate points to smooth out the corners of intersection shapes. |
+| `--no-internal-links` | **Junctions**: Omits the creation of internal links within junctions. This simplifies the network but prevents vehicles from stopping inside the junction. |
+
+## View the network file in Netedit
+
+You may now view `map.net.xml` in netedit:
 
 ```powershell
-netconvert --osm data/osm/map.osm -o module1/03-osm/map_highway.net.xml `
-     --ramps.guess `
-     --junctions.join `
-     --junctions.join-dist 15 `
-     --tls.guess-signals `
-     --tls.discard-simple `
-     --tls.join `
-     --tls.default-type static `
-     -t "$env:SUMO_HOME/data/typemap/osmNetconvert.typ.xml" `
-     --output.street-names `
-     --output.original-names `
-     --keep-edges.by-vclass passenger `
-     --remove-edges.isolated `
-     --geometry.remove `
-     --geometry.max-segment-length 50 `
-     --edges.join `
-     --junctions.corner-detail 5 `
-     --no-internal-links `
-     --keep-edges.by-type highway.motorway,highway.trunk,highway.primary,highway.secondary,highway.tertiary
+netedit --sumo-net-file "module1/03-osm/map.net.xml"
 ```
+
+::: {.lesson-nav}
+[← Netedit](../03-1-netedit/index.qmd)
+
+[🏠 All Lessons](../../index.qmd)
+
+[Next: Traffic Analysis Zones →](../03-3-taz/index.qmd){.primary}
+:::

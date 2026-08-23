@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-08-21">
-<meta name="description" content="Overpass API">
+<meta name="dcterms.date" content="2026-08-22">
+<meta name="description" content="Case Study: Simulating Durham Region (Part 1)">
 
-<title>03.2: Export networks from Open Street Map – SUMO Lessons</title>
+<title>03.2: Import networks from Open Street Map – SUMO Lessons</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bab53aa23e5899ee8bdbfc9c44dcee17.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-417603d509b6438f05d7dd635f4d09ef.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-e260fd85b416db7a213cb5d81dac7d4e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -251,12 +251,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">03.2: Export networks from Open Street Map</h1>
+<h1 class="title">03.2: Import networks from Open Street Map</h1>
 </div>
 
 <div>
   <div class="description">
-    Overpass API
+    Case Study: Simulating Durham Region (Part 1)
   </div>
 </div>
 
@@ -267,7 +267,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 21, 2026</p>
+      <p class="date">August 22, 2026</p>
     </div>
   </div>
   
@@ -279,29 +279,78 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Bounding box: xmin: -79.328 ymin: 43.79446 xmax: -78.43695 ymax: 44.51701</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Case Study">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Case Study
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This post is part of the <strong>Case Study: Simulating Durham Region</strong>. In this case study, we get the relevant data and road network, create Traffic Analysis Zones (TAZ)s, generate trips based on origin-desitination data, create routes, and run simulation.</p>
+<p>This post covers:</p>
+<ul>
+<li>Get Data: Origin-Destination Trip Matrix and Zone shapefile from UToronto’s Transportation Tomorrow Survey (TTS) project</li>
+<li>Export Open Street Map (OSM) network</li>
+<li>Convert OSM network to SUMO compatible network</li>
+</ul>
+</div>
+</div>
+<section id="data" class="level2">
+<h2 data-anchor-id="data">Data</h2>
+<ul>
+<li><a href="https://dmg.utoronto.ca/wp-content/uploads/2022/09/2011_gtha_matrices.pdf">2011 Origin-Destination Trip Matrix (6 - 9 AM) for 36 municipalities</a></li>
+</ul>
+<p>To keep the network and number of trips small in this case-study, we focus on the 8 municipalities in the Brock/Durham region:</p>
+<p><img src="../../assets/od_trip_matrix_8_municipalities.png" class="img-fluid"></p>
+<ul>
+<li><a href="https://dmg.utoronto.ca/wp-content/uploads/2025/01/tts_2006zn_shp.zip">2006 Zone Boundaries</a></li>
+</ul>
+<p>We use the zone boundaries relevant to the 2011 trip matrix.</p>
+<p><img src="../../assets/zones.png" class="img-fluid"></p>
+<p>This file contains a column <code>pd</code> that includes planning districts and also corresponding polygon geometries. According to the <a href="https://dmg.utoronto.ca/pdf/tts/2011/dataguide2011.pdf">2011 TTS Data Guide</a>, <code>pd</code> of 17-24 belong to the Durham region which is the area of interest in our case-study. Therefore, we dissolve the original shapefile into 8 polygons only:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Click to see the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This is R code.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/tts_2006zn_shp/tts_2006zn.shp"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> <span class="fu">st_make_valid</span>(foo)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>durham <span class="ot">&lt;-</span> foo <span class="sc">%&gt;%</span> <span class="fu">filter</span>(pd <span class="sc">%in%</span> <span class="dv">17</span><span class="sc">:</span><span class="dv">24</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>durham_taz <span class="ot">&lt;-</span> durham <span class="sc">%&gt;%</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(pd) <span class="sc">%&gt;%</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">geometry =</span> <span class="fu">st_union</span>(geometry), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_cast</span>(<span class="st">"POLYGON"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">area =</span> <span class="fu">st_area</span>(geometry)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(pd) <span class="sc">%&gt;%</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(area, <span class="at">n =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>area) <span class="sc">%&gt;%</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_simplify</span>(<span class="at">dTolerance =</span> <span class="dv">100</span>, <span class="at">preserveTopology =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">st_write</span>(durham_taz, <span class="st">"data/durham_taz/durham_taz.shp"</span>, <span class="at">delete_layer =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="do">## For bounding box:</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>durham_taz <span class="sc">|&gt;</span> <span class="fu">st_transform</span>(<span class="dv">4326</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p><img src="../../assets/durham_taz_shp.png" class="img-fluid"></p>
+</section>
+<section id="download-map-from-osm" class="level2">
+<h2 data-anchor-id="download-map-from-osm">Download map from OSM</h2>
+<p><a href="https://www.openstreetmap.org/">OSM</a> lets you download road network by selecting a desired area or providing a bounding box. For the Durham region zone boundaries, the bounding box is:</p>
+<blockquote class="blockquote">
+<p>Bounding box: xmin: -79.33 ymin: 43.80 xmax: -78.44 ymax: 44.51</p>
+</blockquote>
+<p>Click Export from the navigation bar on the OSM page, enter the bounding box coordinates and then click the <strong>Overpass API</strong> below to download the network. The file will be downloaded as <code>map</code>, rename it as <code>map.osm</code>.</p>
 <p><img src="../../assets/osm.jpg" class="img-fluid"></p>
-<p>Rename <code>map</code> to <code>map.osm</code>.</p>
-<p>Make sure your current working directory is <code>sumo_workshop</code>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>netconvert <span class="op">--</span>osm <span class="kw">data</span><span class="op">/</span>osm<span class="op">/</span>map<span class="op">.</span><span class="fu">osm</span> <span class="op">-</span>o module1<span class="op">/</span><span class="dv">03</span><span class="op">-</span>osm<span class="op">/</span>map<span class="op">.</span><span class="fu">net</span><span class="op">.</span><span class="fu">xml</span> `</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>ramps<span class="op">.</span><span class="fu">guess</span> `</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>junctions<span class="op">.</span><span class="fu">join</span> `</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>junctions<span class="op">.</span><span class="fu">join</span><span class="op">-</span>dist <span class="dv">15</span> `</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>tls<span class="op">.</span><span class="fu">guess</span><span class="op">-</span>signals `</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>tls<span class="op">.</span><span class="fu">discard</span><span class="op">-</span>simple `</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>tls<span class="op">.</span><span class="fu">join</span> `</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>tls<span class="op">.</span><span class="fu">default</span><span class="op">-</span>type static `</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>     <span class="op">-</span>t <span class="st">"</span><span class="va">$env</span><span class="op">:</span><span class="va">SUMO_HOME</span><span class="st">/data/typemap/osmNetconvert.typ.xml"</span> `</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>output<span class="op">.</span><span class="fu">street</span><span class="op">-</span>names `</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>output<span class="op">.</span><span class="fu">original</span><span class="op">-</span>names `</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>keep-edges<span class="op">.</span><span class="fu">by</span><span class="op">-</span>vclass passenger `</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>remove-edges<span class="op">.</span><span class="fu">isolated</span> `</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>geometry<span class="op">.</span><span class="fu">remove</span> `</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>geometry<span class="op">.</span><span class="fu">max</span><span class="op">-</span>segment-length <span class="dv">50</span> `</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>edges<span class="op">.</span><span class="fu">join</span> `</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>junctions<span class="op">.</span><span class="fu">corner</span><span class="op">-</span>detail <span class="dv">5</span> `</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>no-internal-links</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>netconvert <span class="op">--</span>osm <span class="kw">data</span><span class="op">/</span>osm<span class="op">/</span>map<span class="op">.</span><span class="fu">osm</span> <span class="op">-</span>o module1<span class="op">/</span><span class="dv">03</span><span class="op">-</span>osm<span class="op">/</span>map_highway<span class="op">.</span><span class="fu">net</span><span class="op">.</span><span class="fu">xml</span> `</span>
+</section>
+<section id="convert-map.osm-to-sumo-compatible-map.net.xml" class="level2">
+<h2 data-anchor-id="convert-map.osm-to-sumo-compatible-map.net.xml">Convert <code>map.osm</code> to SUMO compatible <code>map.net.xml</code></h2>
+<p>Make sure your current working directory is <code>sumo_workshop</code>. Now run this in the powershell terminal:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>netconvert <span class="op">--</span>osm <span class="kw">data</span><span class="op">/</span>osm<span class="op">/</span>map<span class="op">.</span><span class="fu">osm</span> <span class="op">-</span>o module1<span class="op">/</span><span class="dv">03</span><span class="op">-</span>osm<span class="op">/</span>map<span class="op">.</span><span class="fu">net</span><span class="op">.</span><span class="fu">xml</span> `</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>ramps<span class="op">.</span><span class="fu">guess</span> `</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>junctions<span class="op">.</span><span class="fu">join</span> `</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>junctions<span class="op">.</span><span class="fu">join</span><span class="op">-</span>dist <span class="dv">15</span> `</span>
@@ -318,10 +367,111 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>geometry<span class="op">.</span><span class="fu">max</span><span class="op">-</span>segment-length <span class="dv">50</span> `</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>edges<span class="op">.</span><span class="fu">join</span> `</span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>junctions<span class="op">.</span><span class="fu">corner</span><span class="op">-</span>detail <span class="dv">5</span> `</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>no-internal-links `</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>keep-edges<span class="op">.</span><span class="fu">by</span><span class="op">-</span>type highway<span class="op">.</span><span class="fu">motorway</span><span class="op">,</span>highway<span class="op">.</span><span class="fu">trunk</span><span class="op">,</span>highway<span class="op">.</span><span class="fu">primary</span><span class="op">,</span>highway<span class="op">.</span><span class="fu">secondary</span><span class="op">,</span>highway<span class="op">.</span><span class="fu">tertiary</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>no-internal-links</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The only required command here is <code>netconvert --osm data/osm/map.osm -o module1/03-osm/map.net.xml</code>. The other <a href="https://sumo.dlr.de/docs/netconvert.html#options">options</a> used here are described as follows:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Flag</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>--osm data/osm/map.osm</code></td>
+<td style="text-align: left;"><strong>Input</strong>: Reads the OpenStreetMap network from the specified file (<code>map.osm</code>).</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>-o module1/03-osm/map.net.xml</code></td>
+<td style="text-align: left;"><strong>Output</strong>: Writes the generated SUMO network to the specified file (<code>map.net.xml</code>).</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--ramps.guess</code></td>
+<td style="text-align: left;"><strong>Processing</strong>: Enables the guessing and marking of highway on-ramps and off-ramps.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--junctions.join</code></td>
+<td style="text-align: left;"><strong>Processing</strong>: Joins junctions that are very close to each other, which is often recommended for OSM imports to simplify the network.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--junctions.join-dist 15</code></td>
+<td style="text-align: left;"><strong>Processing</strong>: Sets the maximal distance (in meters) for joining junctions. The default is 10; this sets it to 15.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--tls.guess-signals</code></td>
+<td style="text-align: left;"><strong>TLS Building</strong>: Interprets nodes surrounding an intersection as signal positions for a larger traffic light system. This is a typical pattern for OSM-derived networks.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--tls.discard-simple</code></td>
+<td style="text-align: left;"><strong>TLS Building</strong>: Does not instantiate traffic lights at simple, geometry-like nodes that are loaded from non-plain-XML formats (like OSM).</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--tls.join</code></td>
+<td style="text-align: left;"><strong>TLS Building</strong>: Tries to cluster traffic-light-controlled nodes that are close together into a single logic.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--tls.default-type static</code></td>
+<td style="text-align: left;"><strong>TLS Building</strong>: Sets the default traffic light algorithm for nodes with unspecified types to <code>static</code> (fixed-time control).</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>-t "$env:SUMO_HOME/data/typemap/osmNetconvert.typ.xml"</code></td>
+<td style="text-align: left;"><strong>Input</strong>: Reads XML type definitions from the specified file. This typemap is crucial for mapping OSM <code>highway</code> types to SUMO edge attributes like speed and number of lanes.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--output.street-names</code></td>
+<td style="text-align: left;"><strong>Output</strong>: Includes street names in the output <code>.net.xml</code> file if they are available in the input data.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--output.original-names</code></td>
+<td style="text-align: left;"><strong>Output</strong>: Writes the original names (e.g., from OSM) as a parameter in the output file.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--keep-edges.by-vclass passenger</code></td>
+<td style="text-align: left;"><strong>Edge Removal</strong>: Only keeps edges that allow the vehicle class <code>passenger</code>. All other edges (e.g., railways, pedestrian paths) are removed from the network.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--remove-edges.isolated</code></td>
+<td style="text-align: left;"><strong>Edge Removal</strong>: Removes edges that are isolated and not connected to the rest of the network.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--geometry.remove</code></td>
+<td style="text-align: left;"><strong>Processing</strong>: Replaces nodes that only serve to define edge geometry with geometry points, effectively joining the edges to remove unnecessary nodes.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--geometry.max-segment-length 50</code></td>
+<td style="text-align: left;"><strong>Processing</strong>: Splits long geometry segments so that no segment is longer than 50 meters. This can improve accuracy and visual appearance.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--edges.join</code></td>
+<td style="text-align: left;"><strong>Processing</strong>: Merges edges that connect the same two nodes and are geometrically close to each other.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>--junctions.corner-detail 5</code></td>
+<td style="text-align: left;"><strong>Junctions</strong>: Generates 5 intermediate points to smooth out the corners of intersection shapes.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>--no-internal-links</code></td>
+<td style="text-align: left;"><strong>Junctions</strong>: Omits the creation of internal links within junctions. This simplifies the network but prevents vehicles from stopping inside the junction.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="view-the-network-file-in-netedit" class="level2">
+<h2 data-anchor-id="view-the-network-file-in-netedit">View the network file in Netedit</h2>
+<p>You may now view <code>map.net.xml</code> in netedit:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>netedit <span class="op">--</span>sumo-net-file <span class="st">"module1/03-osm/map.net.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="lesson-nav">
+<p><a href="../../posts/03-1-netedit/index.html">← Netedit</a></p>
+<p><a href="../../index.html">🏠 All Lessons</a></p>
+<p><a href="../../posts/03-3-taz/index.html" class="primary">Next: Traffic Analysis Zones →</a></p>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <div class="sumo-footer-shell" aria-hidden="true">
@@ -422,6 +572,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
         }
       }
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {

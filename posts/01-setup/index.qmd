@@ -8,25 +8,27 @@ title-block-banner: false
 number-sections: true
 ---
 
-**SUMO (Simulation of Urban MObility)** is a microscopic and continuous multi-modal traffic 
+> **SUMO (Simulation of Urban MObility)** is a microscopic and continuous multi-modal traffic 
 simulation package designed to handle large networks.
 
 [Docs](https://sumo.dlr.de/docs/index.html){target="_blank"}
 
 ## Install SUMO
 
-SUMO is available to download on the [official website](https://eclipse.dev/sumo/){target="_blank"}. However, for the Traffic Analysis Zone (TAZ) part covered later in the workshop, we need to isntall SUMO with some extras. You may install SUMO with extras [here](https://sumo.dlr.de/releases/1.27.1/sumo-win64extra-1.27.1.msi).
+SUMO is available to download on the [official website](https://eclipse.dev/sumo/){target="_blank"}. However, for the Traffic Analysis Zone (TAZ) part covered later in the workshop, we need to install SUMO with some extras. You may install SUMO with extras [here](https://sumo.dlr.de/releases/1.27.1/sumo-win64extra-1.27.1.msi).
 
-During installation accept the defaults. Then check that it is installed by searching `sumo-gui`.
+Accept all the default options during installation. Then check that SUMO is installed by searching `sumo-gui` in Windows search. You may also run the command `sumo-gui` in your terminal to launch an empty SUMO window.
 
 ## Create `SUMO_HOME` system variable 
+
+The `SUMO_HOME` system variable is created for you during the installation. Follow the steps below to confirm that is the case or crate the variable yourself.
 
 On Windows:
 
 * Search for 'Edit the system environment variables'
 * Click **Environment Variables**
 * Create a new variable named `SUMO_HOME` in the 'System variables' section
-* Enter the path to SUMO binary in the 'Variable value' text box. For example: `C:\Program Files (x86)\Eclipse\Sumo\`
+* Enter the path to SUMO binary (i.e., the path where SUMO is installed) in the 'Variable value' text box. For example: `C:\Program Files (x86)\Eclipse\Sumo\`
 * Click OK in all the windows
 
 ## Install `uv`
@@ -37,7 +39,7 @@ On Windows:
 
 * Go to [Installation page](https://docs.astral.sh/uv/getting-started/installation/){target="_blank"}
 * Run the command for your operating system, e.g., in Windows, copy and paste the given command in PowerShell (Open PowerShell by searching it in Windows).
-* Close PowerShell
+* Close PowerShell when done
 
 
 ## Install Python
@@ -61,11 +63,11 @@ Accept all the defaults in the installation setup. Once installed, Positron woul
 
 ## Download and sync workshop folder
 
-* Download the zipped folder [`sumo_workshop`](https://github.com/transportation-sci/sumo_workshop) from GitHub and extract it. You can download it by clicking the dropdown menu of the green code button and clicking `Download ZIP`. Make sure to extract it by right clicking the zipped folder and click Extract All.
-* Open Positron, click Open > Open Folder and select the extracted folder
-* You may see a dialog box in Positron asking if yoy trust the authors. Select yes I trust the authors. Dismiss any notifications.
-* Run `uv sync` in terminal. If you don't see the terminal, click `Ctrl + Shift + backtick`. If the command `uv sync` does not work, restart Positron and try again.
-* Once Python and packages are installed, you will see `.venv` created in Positron's files explorer. See if Python is working by clicking `Start Session` at the top-right of Positron and selecting `Python 3.14.x (uv: sumo-workshop)`. That would start Python in a console window (you may have to click allow in a different window first). Run the following Python command:
+* Download the zipped folder [`sumo_workshop`](https://github.com/transportation-sci/sumo_workshop){target="_blank"} from GitHub and extract it. You can download it by clicking the dropdown menu of the green code button and clicking `Download ZIP`. Make sure to extract it by right clicking the zipped folder and click Extract All.
+* Open Positron, and inside, click Open > Open Folder and select the extracted folder
+* You may see a dialog box in Positron asking if you trust the authors. Select "Yes I trust the authors". Dismiss any notifications.
+* Run `uv sync` in terminal. If you don't see the terminal, click `Ctrl + Shift + backtick` OR click Terminal > New Terminal. If the command `uv sync` does not work, restart Positron and try again.
+* Once Python and packages are installed after running `uv sync`, you will see `.venv` created in Positron's files explorer. See if Python is working by clicking `Start Session` at the top-right of Positron and selecting `Python 3.14.x (uv: sumo-workshop)`. That would start Python in a console window (you may have to click allow in a different window first). Run the following Python command:
 
 ```python
 1 + 1

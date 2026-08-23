@@ -1,6 +1,6 @@
 ---
-title: "03.1: Create networks by hand in netedit"
-description: "Intersections and Highways"
+title: "03.1: Create networks by hand"
+description: "Use `netedit` to create intersections and highways"
 date: today
 image: /assets/roundabout.jpg
 page-layout: full
@@ -8,7 +8,7 @@ title-block-banner: false
 ---
 
 ::: {.callout-note title="NetEdit"}
-`netedit` is a software installed with SUMO. It enables the manual creation of road networks including intersections, roundabouts, and highways. Moreover, `netedit` lets you create traffic light states and add traffic demand.
+`netedit` is a software installed with SUMO. It enables the manual creation of multimodal road networks including intersections, roundabouts, highways and more. Moreover, `netedit` lets you create traffic light states and add traffic demand.
 :::
 
 ## Creating intersections
@@ -58,3 +58,20 @@ netconvert `
 Click on the slide below and press the 'f' key to make it full screen. Then press the right arrow key repeatedly to see the anatomy of a simple highway network in SUMO.
 
 <iframe src="sumo-deconstructed.html" width="100%" height="500px"></iframe>
+
+## Relevant resources
+
+- [SUMO Traffic Simulator Tutorial by RoadwayVR](https://youtube.com/playlist?list=PLAk8GOoajG6tKI74YID0hwjXVg8KBxNAD&si=xp2-IuYKmceg_fcE)
+
+- [Pedestrian sidewalks and crossing simulation](https://sumo.dlr.de/docs/Tutorials/Jupedsim/crossing-simulation.html)
+
+- [Convert Vissim, Visum, MATsim and other networks to SUMO network](https://sumo.dlr.de/docs/netconvert.html#supported_network_formats)
+
+
+::: {.lesson-nav}
+[← OSM Web Wizard](../02-whole_game/index.qmd)
+
+[🏠 All Lessons](../../index.qmd)
+
+[Next: Import Network from OSM →](../03-2-osm/index.qmd){.primary}
+:::

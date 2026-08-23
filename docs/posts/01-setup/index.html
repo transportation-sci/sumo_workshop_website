@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-08-21">
+<meta name="dcterms.date" content="2026-08-22">
 <meta name="description" content="Install SUMO, Python, and uv">
 
 <title>01: Setup – SUMO Lessons</title>
@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bab53aa23e5899ee8bdbfc9c44dcee17.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-417603d509b6438f05d7dd635f4d09ef.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-e260fd85b416db7a213cb5d81dac7d4e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -267,7 +267,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 21, 2026</p>
+      <p class="date">August 22, 2026</p>
     </div>
   </div>
   
@@ -279,21 +279,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<blockquote class="blockquote">
 <p><strong>SUMO (Simulation of Urban MObility)</strong> is a microscopic and continuous multi-modal traffic simulation package designed to handle large networks.</p>
+</blockquote>
 <p><a href="https://sumo.dlr.de/docs/index.html" target="_blank">Docs</a></p>
 <section id="install-sumo" class="level2" data-number="1">
 <h2 data-number="1" data-anchor-id="install-sumo"><span class="header-section-number">1</span> Install SUMO</h2>
-<p>SUMO is available to download on the <a href="https://eclipse.dev/sumo/" target="_blank">official website</a>. However, for the Traffic Analysis Zone (TAZ) part covered later in the workshop, we need to isntall SUMO with some extras. You may install SUMO with extras <a href="https://sumo.dlr.de/releases/1.27.1/sumo-win64extra-1.27.1.msi">here</a>.</p>
-<p>During installation accept the defaults. Then check that it is installed by searching <code>sumo-gui</code>.</p>
+<p>SUMO is available to download on the <a href="https://eclipse.dev/sumo/" target="_blank">official website</a>. However, for the Traffic Analysis Zone (TAZ) part covered later in the workshop, we need to install SUMO with some extras. You may install SUMO with extras <a href="https://sumo.dlr.de/releases/1.27.1/sumo-win64extra-1.27.1.msi">here</a>.</p>
+<p>Accept all the default options during installation. Then check that SUMO is installed by searching <code>sumo-gui</code> in Windows search. You may also run the command <code>sumo-gui</code> in your terminal to launch an empty SUMO window.</p>
 </section>
 <section id="create-sumo_home-system-variable" class="level2" data-number="2">
 <h2 data-number="2" data-anchor-id="create-sumo_home-system-variable"><span class="header-section-number">2</span> Create <code>SUMO_HOME</code> system variable</h2>
+<p>The <code>SUMO_HOME</code> system variable is created for you during the installation. Follow the steps below to confirm that is the case or crate the variable yourself.</p>
 <p>On Windows:</p>
 <ul>
 <li>Search for ‘Edit the system environment variables’</li>
 <li>Click <strong>Environment Variables</strong></li>
 <li>Create a new variable named <code>SUMO_HOME</code> in the ‘System variables’ section</li>
-<li>Enter the path to SUMO binary in the ‘Variable value’ text box. For example: <code>C:\Program Files (x86)\Eclipse\Sumo\</code></li>
+<li>Enter the path to SUMO binary (i.e., the path where SUMO is installed) in the ‘Variable value’ text box. For example: <code>C:\Program Files (x86)\Eclipse\Sumo\</code></li>
 <li>Click OK in all the windows</li>
 </ul>
 </section>
@@ -304,7 +307,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li>Go to <a href="https://docs.astral.sh/uv/getting-started/installation/" target="_blank">Installation page</a></li>
 <li>Run the command for your operating system, e.g., in Windows, copy and paste the given command in PowerShell (Open PowerShell by searching it in Windows).</li>
-<li>Close PowerShell</li>
+<li>Close PowerShell when done</li>
 </ul>
 </section>
 <section id="install-python" class="level2" data-number="4">
@@ -326,11 +329,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="download-and-sync-workshop-folder" class="level2" data-number="6">
 <h2 data-number="6" data-anchor-id="download-and-sync-workshop-folder"><span class="header-section-number">6</span> Download and sync workshop folder</h2>
 <ul>
-<li>Download the zipped folder <a href="https://github.com/transportation-sci/sumo_workshop"><code>sumo_workshop</code></a> from GitHub and extract it. You can download it by clicking the dropdown menu of the green code button and clicking <code>Download ZIP</code>. Make sure to extract it by right clicking the zipped folder and click Extract All.</li>
-<li>Open Positron, click Open &gt; Open Folder and select the extracted folder</li>
-<li>You may see a dialog box in Positron asking if yoy trust the authors. Select yes I trust the authors. Dismiss any notifications.</li>
-<li>Run <code>uv sync</code> in terminal. If you don’t see the terminal, click <code>Ctrl + Shift + backtick</code>. If the command <code>uv sync</code> does not work, restart Positron and try again.</li>
-<li>Once Python and packages are installed, you will see <code>.venv</code> created in Positron’s files explorer. See if Python is working by clicking <code>Start Session</code> at the top-right of Positron and selecting <code>Python 3.14.x (uv: sumo-workshop)</code>. That would start Python in a console window (you may have to click allow in a different window first). Run the following Python command:</li>
+<li>Download the zipped folder <a href="https://github.com/transportation-sci/sumo_workshop" target="_blank"><code>sumo_workshop</code></a> from GitHub and extract it. You can download it by clicking the dropdown menu of the green code button and clicking <code>Download ZIP</code>. Make sure to extract it by right clicking the zipped folder and click Extract All.</li>
+<li>Open Positron, and inside, click Open &gt; Open Folder and select the extracted folder</li>
+<li>You may see a dialog box in Positron asking if you trust the authors. Select “Yes I trust the authors”. Dismiss any notifications.</li>
+<li>Run <code>uv sync</code> in terminal. If you don’t see the terminal, click <code>Ctrl + Shift + backtick</code> OR click Terminal &gt; New Terminal. If the command <code>uv sync</code> does not work, restart Positron and try again.</li>
+<li>Once Python and packages are installed after running <code>uv sync</code>, you will see <code>.venv</code> created in Positron’s files explorer. See if Python is working by clicking <code>Start Session</code> at the top-right of Positron and selecting <code>Python 3.14.x (uv: sumo-workshop)</code>. That would start Python in a console window (you may have to click allow in a different window first). Run the following Python command:</li>
 </ul>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="op">+</span> <span class="dv">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>If the code above runs, you’re all set!</p>
@@ -442,6 +445,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
         }
       }
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {

@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-08-21">
-<meta name="description" content="Overpass API">
+<meta name="dcterms.date" content="2026-08-22">
+<meta name="description" content="Case Study: Simulating Durham Region (Part 2)">
 
-<title>03.3: TAZ – SUMO Lessons</title>
+<title>03.3: Traffic Analysis Zones – SUMO Lessons</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bab53aa23e5899ee8bdbfc9c44dcee17.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-417603d509b6438f05d7dd635f4d09ef.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-e260fd85b416db7a213cb5d81dac7d4e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -251,12 +251,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">03.3: TAZ</h1>
+<h1 class="title">03.3: Traffic Analysis Zones</h1>
 </div>
 
 <div>
   <div class="description">
-    Overpass API
+    Case Study: Simulating Durham Region (Part 2)
   </div>
 </div>
 
@@ -267,7 +267,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 21, 2026</p>
+      <p class="date">August 22, 2026</p>
     </div>
   </div>
   
@@ -279,21 +279,75 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<div class="callout callout-style-default callout-note callout-titled" title="Case Study">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Case Study
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This post is part of the <strong>Case Study: Simulating Durham Region</strong>. In this case study, we get the relevant data and road network, create Traffic Analysis Zones (TAZs), generate trips based on origin-desitination data, create routes, and run simulation.</p>
+<p>This post generates <strong>Traffic Analysis Zones (TAZs)</strong> based on the Durham region shapefile (polygons of planning districts) and the <code>map.net.xml</code> generated in the previous post.</p>
+</div>
+</div>
+<p>TAZs are defined <a href="https://arxiv.org/html/2304.05982v2">in this tutorial</a> as:</p>
+<blockquote class="blockquote">
+<p>Traffic Analysis Zones (TAZs) are spatial units used in transportation modeling and traffic studies to represent areas with similar travel behavior. A TAZ typically models a neighborhood or district, and serves as a fundamental unit for estimating travel demand. Each zone can be associated with socio-economic and demographic data, such as population, employment, and land use. This information influences the number and type of trips generated within the area. TAZs are commonly used in trip-based models, such as the traditional four-step travel demand model (trip generation, trip distribution, mode choice, and route assignment).</p>
+</blockquote>
+<section id="generate-taz-polygons" class="level2">
+<h2 data-anchor-id="generate-taz-polygons">Generate TAZ polygons</h2>
 <p>Make sure your current working directory is <code>sumo_workshop</code>.</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Caution</span>Set the environment variable <code>PROJ_LIB</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>polyconvert</code> tool below utilizes the Durham shapefile which contains the <code>proj</code>ection information about the region. That is possible since we downloaded SUMO with extras. One of those extras is the <code>proj</code> tool. We set the path to <code>proj</code> as an environment variable in powershell:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">$env</span><span class="op">:</span><span class="va">PROJ_LIB</span><span class="op">=</span><span class="st">"C:\Program Files (x86)\Eclipse\Sumo\data\proj\"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+<p>Now we use <code>polyconvert</code> to convert the shapefile to SUMO compatible shapes that can be visualized in SUMO or netedit:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>polyconvert <span class="op">--</span>shapefile-prefix <span class="st">"data/durham_taz/durham_taz"</span> `</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>shapefile<span class="op">.</span><span class="fu">guess</span><span class="op">-</span>projection true `</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>shapefile<span class="op">.</span><span class="fu">traditional</span><span class="op">-</span>axis-mapping true `</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>     <span class="op">--</span>shapefile<span class="op">.</span><span class="fu">id</span><span class="op">-</span>column pd `</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>     <span class="op">-</span>n <span class="st">"module1/03-osm/map.net.xml"</span> <span class="op">-</span>o <span class="st">"module1/04-taz/taz_polygons.poly.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>uv run <span class="st">"</span><span class="va">$env</span><span class="op">:</span><span class="va">SUMO_HOME</span><span class="st">/tools/edgesInDistricts.py"</span> `</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span>n <span class="st">"module1/03-osm/map.net.xml"</span> `</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span>t <span class="st">"module1/04-taz/taz_polygons.poly.xml"</span> `</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span>o <span class="st">"module1/04-taz/TAZ.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>netedit <span class="op">--</span>sumo-net-file <span class="st">"module1/03-osm/map.net.xml"</span> `</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">--</span>additional-files <span class="st">"module1/04-taz/taz_polygons.poly.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Then view the <code>taz_polygons.poly.xml</code>.</p>
+<p>Now you may visualize the polygons in netedit:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>netedit <span class="op">--</span>sumo-net-file <span class="st">"module1/03-osm/map.net.xml"</span> `</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">--</span>additional-files <span class="st">"module1/04-taz/taz_polygons.poly.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><img src="../../assets/taz_poly_netedit.png" class="img-fluid"></p>
+</section>
+<section id="generate-tazs" class="level2">
+<h2 data-anchor-id="generate-tazs">Generate TAZs</h2>
+<p>Create the TAZs by providing the polygons and network file to the <code>edgesInDistricts.py</code> script. This generates a TAZ file that specifies what edges belong to which TAZ.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>uv run <span class="st">"</span><span class="va">$env</span><span class="op">:</span><span class="va">SUMO_HOME</span><span class="st">/tools/edgesInDistricts.py"</span> `</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span>n <span class="st">"module1/03-osm/map.net.xml"</span> `</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span>t <span class="st">"module1/04-taz/taz_polygons.poly.xml"</span> `</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">-</span>o <span class="st">"module1/04-taz/TAZ.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Open the <code>TAZ.xml</code> file to see the edges in each TAZ.</p>
+<p>You may also see just the estimated TAZs:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>netedit <span class="op">--</span>sumo-net-file <span class="st">"module1/03-osm/map.net.xml"</span> `</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">--</span>additional-files <span class="st">"module1/04-taz/TAZ.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Moreover, you may color the edges by TAZs in SUMO:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sumo-gui <span class="op">-</span>n <span class="st">"module1/03-osm/map.net.xml"</span> <span class="op">-</span>a <span class="st">"module1/04-taz/TAZ.xml"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><img src="../../assets/taz_sumo.png" class="img-fluid"></p>
+<div class="lesson-nav">
+<p><a href="../../posts/03-2-osm/index.html">← Import from OSM</a></p>
+<p><a href="../../index.html">🏠 All Lessons</a></p>
+<p><a href="../.." class="primary">Next: Routing →</a></p>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <div class="sumo-footer-shell" aria-hidden="true">
@@ -394,6 +448,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
         }
       }
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {

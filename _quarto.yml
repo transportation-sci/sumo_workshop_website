@@ -16,3 +16,4 @@ format:
     title-block-banner: false
     anchor-sections: false
     smooth-scroll: false
+    link-external-newwindow: true

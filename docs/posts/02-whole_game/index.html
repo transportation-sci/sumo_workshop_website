@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-08-21">
+<meta name="dcterms.date" content="2026-08-22">
 <meta name="description" content="Running your first simulation">
 
 <title>02: The Whole Game – SUMO Lessons</title>
@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bab53aa23e5899ee8bdbfc9c44dcee17.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-417603d509b6438f05d7dd635f4d09ef.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-e260fd85b416db7a213cb5d81dac7d4e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -267,7 +267,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 21, 2026</p>
+      <p class="date">August 22, 2026</p>
     </div>
   </div>
   
@@ -292,7 +292,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-anchor-id="steps-to-generate-an-example-scenario">Steps to generate an example scenario</h3>
 <p>Open the <code>sumo_workshop</code> folder in Positron.</p>
 <ol type="1">
-<li>Run the following in Powershell:</li>
+<li>Run the following in the Powershell terminal inside Positron:</li>
 </ol>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cd</span> <span class="op">.</span>\module1\<span class="dv">01</span><span class="op">-</span>theWholeGame\</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>uv run <span class="st">"</span><span class="va">$env</span><span class="op">:</span><span class="va">SUMO_HOME</span><span class="st">\tools\osmWebWizard.py"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -314,7 +314,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li>Increase the <strong>Delay (ms)</strong> to &gt; 500 so you’d be able to see the traffic in slow motion</li>
 <li>Click the Run button (looks like the Play button)</li>
-<li>If vehicles are not seen right away, click on the <strong>Locate Structures</strong> button (question mark icon) and then click the <strong>Locate Vehicles</strong> button. Select any vehicle and the click <em>Center</em> or <em>Track</em></li>
+<li>If vehicles are not seen right away, click on the <strong>Locate Structures</strong> button (question mark icon) and then click the <strong>Locate Vehicles</strong> button. Select any vehicle and then click <em>Center</em> or <em>Track</em></li>
 <li>You may stop the simulation at any time</li>
 </ol>
 <p><img src="../../assets/osm_web_wizard.gif" class="img-fluid"></p>
@@ -327,6 +327,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>osm.net.xml.gz</code>: Network</li>
 <li><code>osm.passenger.trips.xml</code> and <code>osm.trucks.trips.xml</code>: Individual trips at random road segments</li>
 <li><code>osm.sumocfg</code>: Configuration file that specifies the network, route (trips), output, and other files</li>
+</ul>
+</section>
+<section id="relevant-resources" class="level2">
+<h2 data-anchor-id="relevant-resources">Relevant resources</h2>
+<ul>
+<li><a href="https://sumo.dlr.de/docs/Tutorials/OSMWebWizard.html" target="_blank">OSMWebWizard Docs</a></li>
 </ul>
 <div class="lesson-nav">
 <p><a href="../../posts/01-setup/index.html">← Setup</a></p>
@@ -436,6 +442,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
         }
       }
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {

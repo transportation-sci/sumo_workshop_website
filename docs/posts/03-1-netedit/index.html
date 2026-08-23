@@ -6,10 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-08-21">
-<meta name="description" content="Intersections and Highways">
+<meta name="dcterms.date" content="2026-08-22">
+<meta name="description" content="Use netedit to create intersections and highways">
 
-<title>03.1: Create networks by hand in netedit – SUMO Lessons</title>
+<title>03.1: Create networks by hand – SUMO Lessons</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../../site_libs/quarto-html/quarto-syntax-highlighting-bab53aa23e5899ee8bdbfc9c44dcee17.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-417603d509b6438f05d7dd635f4d09ef.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-e260fd85b416db7a213cb5d81dac7d4e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script src="../../site_libs/quarto-contrib/videojs/video.min.js"></script>
 <link href="../../site_libs/quarto-contrib/videojs/video-js.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
@@ -253,12 +253,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">03.1: Create networks by hand in netedit</h1>
+<h1 class="title">03.1: Create networks by hand</h1>
 </div>
 
 <div>
   <div class="description">
-    Intersections and Highways
+    Use <code>netedit</code> to create intersections and highways
   </div>
 </div>
 
@@ -269,7 +269,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">August 21, 2026</p>
+      <p class="date">August 22, 2026</p>
     </div>
   </div>
   
@@ -291,7 +291,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><code>netedit</code> is a software installed with SUMO. It enables the manual creation of road networks including intersections, roundabouts, and highways. Moreover, <code>netedit</code> lets you create traffic light states and add traffic demand.</p>
+<p><code>netedit</code> is a software installed with SUMO. It enables the manual creation of multimodal road networks including intersections, roundabouts, highways and more. Moreover, <code>netedit</code> lets you create traffic light states and add traffic demand.</p>
 </div>
 </div>
 <section id="creating-intersections" class="level2">
@@ -330,9 +330,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Click on the slide below and press the ‘f’ key to make it full screen. Then press the right arrow key repeatedly to see the anatomy of a simple highway network in SUMO.</p>
 <iframe src="sumo-deconstructed.html" width="100%" height="500px">
 </iframe>
-
-
 </section>
+</section>
+<section id="relevant-resources" class="level2">
+<h2 data-anchor-id="relevant-resources">Relevant resources</h2>
+<ul>
+<li><p><a href="https://youtube.com/playlist?list=PLAk8GOoajG6tKI74YID0hwjXVg8KBxNAD&amp;si=xp2-IuYKmceg_fcE">SUMO Traffic Simulator Tutorial by RoadwayVR</a></p></li>
+<li><p><a href="https://sumo.dlr.de/docs/Tutorials/Jupedsim/crossing-simulation.html">Pedestrian sidewalks and crossing simulation</a></p></li>
+<li><p><a href="https://sumo.dlr.de/docs/netconvert.html#supported_network_formats">Convert Vissim, Visum, MATsim and other networks to SUMO network</a></p></li>
+</ul>
+<div class="lesson-nav">
+<p><a href="../../posts/02-whole_game/index.html">← OSM Web Wizard</a></p>
+<p><a href="../../index.html">🏠 All Lessons</a></p>
+<p><a href="../../posts/03-2-osm/index.html" class="primary">Next: Import Network from OSM →</a></p>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -434,6 +447,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
         }
       }
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {

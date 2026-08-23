@@ -11,4 +11,4 @@ page-layout: full
 title-block-banner: false
 ---
 
-A course on **SUMO (Simulation of Urban MObility)**. Pick a lesson below, or open it from the **File** menu above at any time.
+This site contains the work-in-progress materials for a series of workshops on **SUMO (Simulation of Urban MObility)**. Pick a lesson below, or open it from the **File** menu above at any time.

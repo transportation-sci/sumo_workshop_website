@@ -20,7 +20,7 @@ OSM stands for [Open Street Map](https://www.openstreetmap.org/){target="_blank"
 
 Open the `sumo_workshop` folder in Positron.
 
-1. Run the following in Powershell:
+1. Run the following in the Powershell terminal inside Positron:
 
 ```powershell
 cd .\module1\01-theWholeGame\
@@ -46,7 +46,7 @@ The previous step would open SUMO for you. If it didn't or you closed SUMO, you 
 
 1. Increase the **Delay (ms)** to > 500 so you'd be able to see the traffic in slow motion
 2. Click the Run button (looks like the Play button)
-3. If vehicles are not seen right away, click on the **Locate Structures** button (question mark icon) and then click the **Locate Vehicles** button. Select any vehicle and the click *Center* or *Track*
+3. If vehicles are not seen right away, click on the **Locate Structures** button (question mark icon) and then click the **Locate Vehicles** button. Select any vehicle and then click *Center* or *Track*
 4. You may stop the simulation at any time
 
 ![](/assets/osm_web_wizard.gif)
@@ -60,6 +60,9 @@ The previous step would open SUMO for you. If it didn't or you closed SUMO, you 
 * `osm.sumocfg`: Configuration file that specifies the network, route (trips), output, and other files
 
 
+## Relevant resources
+
+- [OSMWebWizard Docs](https://sumo.dlr.de/docs/Tutorials/OSMWebWizard.html){target="_blank"}
 
 
 
